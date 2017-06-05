@@ -708,7 +708,23 @@ WKUP25:
               rcr     6
               regn=c  14
               s13=    0             ; clear running flag
-                                    ; release all I/O buffers
+              gosub   RSTKB
+; * Check for master clear here
+; * The protocol for master clear is to press and hold the
+; * backarrow key while simultaneously hitting the ON key.
+; * This sequence was moved ahead of the I/O buffer check
+; * to allow the user to recover from an infinite loop
+; * (733-752) by using master clear 12/21/81 WCW
+              chk kb                ; another key down?
+              gonc    WKUP60        ; no
+              ldi     0xc3          ; yes. see if it is BKARROW (KC FOR BKARROW)
+              a=c     x
+              c=keys
+              rcr     3
+              pt=     1
+              ?a#c    wpt
+              gonc    WKUP90        ; master clear
+WKUP60:                             ; release all I/O buffers
               c=regn  13
               bcex                  ; chainhead to B.X
               ldi     191
@@ -739,21 +755,6 @@ WKUP50:       ldi     7             ; deep sleep
                                     ; returns with chip 0 disabled
               c=0                   ; re-enable chip 0
               dadd=c
-              gosub   RSTKB
-
-; * Check for master clear here
-; * The protocol for master clear is to press and hold the
-; * backarrow key while simultaneously hitting the ON key.
-              chk kb                ; another key down?
-              gonc    WKUP60        ; no
-              ldi     0xc3          ; yes. see if it is BKARROW (KC FOR BKARROW)
-              a=c     x
-              c=keys
-              rcr     3
-              pt=     1
-              ?a#c    wpt
-              gonc    COLDST        ; master clear
-WKUP60:
               distog                ; turn the display back on
 WKUP70:       c=regn  14
               rcr     11
@@ -807,7 +808,14 @@ MEMCHK:       rst kb                ; these three states
               ldi     0x169         ; warm start constant
               a=c     x
               c=regn  13
-              rcr     6
+; ************************************************************************
+; * WKUP90 added 12/22/81 to provide a means for the relocated backarrow
+; * test gonc (724) to reach COLDST (1062).  Since the jump at 1021 is a
+; * goc, the master clear sequence jumps in at WKUP90. The rcr 6  in-
+; * sures the the contents of C are not equal to A.  The X field of C
+; * will be X00 following the rcr.  The 00 remains from 705.
+; ************************************************************************
+WKUP90:       rcr     6
               ?a#c    x             ; cold start?
               goc     COLDST        ; yes
                                     ; now hexmode is assumed
