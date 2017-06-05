@@ -86,7 +86,7 @@ RMAD20:       c=c+1   m             ; point to 2nd word of ROM
               c=b     x             ; load the FC #
               a=c
               cxisa                 ; load # of FC's in the ROM
-              c=c+1   x
+              nop                   ;  (deleted bug) 12/8/91 WCW
               ?a<c    x             ; is the FC in the ROM ?
               gonc    RMAD30        ; no, FC # too big
               acex    x             ; C.X _ FC #
