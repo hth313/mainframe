@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModFile FileFormat="MOD1" Title="HP-41CV" Version="GFF" PartNumber="" Author="Hewlett-Packard" Copyright="Hewlett-Packard" License="Hewlett-Packard Company makes no warranty as to the accuracy or completeness of the foregoing information and hereby disclaims any responsibility therefore." Comments="The most common HP-41CV mainframe ROM. Date Codes: 2035-84?? - Bugs 5, 7, 8 removed too" Category="1" Hardware="0">
+<ModFile FileFormat="MOD1" Title="HP-41CV" Version="HFF" PartNumber="" Author="Hewlett-Packard" Copyright="Hewlett-Packard" License="Hewlett-Packard Company makes no warranty as to the accuracy or completeness of the foregoing information and hereby disclaims any responsibility therefore." Comments="The final HP-41CV mainframe ROM." Category="1" Hardware="0">
   <Page Name="NUT0" Identity="G" Page="0" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
   <Page Name="NUT1" Identity="F" Page="1" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
   <Page Name="NUT2" Identity="F" Page="2" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
