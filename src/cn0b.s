@@ -4,12 +4,20 @@
 ;;; Original file CN0B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @0-1777
 ; *
 
               .section QUAD0
+
+#if defined(HP41CX)
+#define PauseCounter 80
+#define REG00        0x19c
+#else
+#define PauseCounter 92
+#define REG00        0xef
+#endif
 
 ;;; Entry points
               .public ADRFCH
@@ -596,6 +604,8 @@ DRSY26:       c=c-1   x
               gosub   RSTKB
 
 
+; * Entry point added for HP-41CX
+              .public DRSY30
 DRSY30:       s4=     0             ; clear SSTFLAG
               gosub   STOST0
 
@@ -646,13 +656,15 @@ DRSY51:                             ; this entry used to bypass
 ; *
 
 PAUSLP:       gosub   PGMAON        ; turn on prgm annunciator
-              ldi     92            ; initialize pausetimer
-              a=c     X             ; A.X=pausetimer
+              ldi     PauseCounter  ; initialize pausetimer
+              a=c     x             ; A.X=pausetimer
 ; * Pausetimer set empirically to match hp67 on a benchmark PGM
 ; * consisting of 100 pse's followed by fix 9, stop.
 ; * This timing was subsequently screwed up by extending ROMCHK's
 ; * search from addresses 6-F down to 5-F.  HP-41C's PSE is now
 ; * .1-.2 sec longer than HP-67's.  DRC 10/20/79
+; * Changed to use a #define instead, as the HP-41CX extends it
+; * into page 3 as well.  hth313 5/Jun/2017
 PAUS10:       chk kb                ; is a key down?
               goc     WKUP20        ; yes
               ldi     12
@@ -914,11 +926,11 @@ ILOOP:        acex
               a=a-1   x
               gonc    ILOOP
 
-              ldi     0xef          ; initialize reg0 (OEF)
+              ldi     REG00         ; initialize reg0 (OEF or 19C)
               rcr     8
-              ldi     0xfa          ; initialize SIGMADDR (0FA)
+              ldi     REG00 + 11    ; initialize SIGMADDR (0FA or 1A7)
               rcr     3
-              ldi     0xee          ; initialize chain head (0EE)
+              ldi     REG00 - 1     ; initialize chain head (0EE or 19B)
               regn=c  13
               c=0     m
               c=c+1
@@ -928,7 +940,7 @@ ILOOP:        acex
               pt=     5
               lc      12
               ldi     32
-              regn=c  14
+              regn=c  (REG00 - 1) & 15
               c=0                   ; initialize status bits
               dadd=c
               pt=     7
@@ -1043,7 +1055,8 @@ CONFLG:       acex                  ; move binary flag number to A
               gonc    ERRNE
 ; *
 ; * The entry point "ALLOK" was added by Steve Chou on 02-11-81
-; * for the function "STOFLAG" in the advanced programming rom
+; * for the function "STOFLAG" in the Advanced Programming ROM
+; * (hth313: This was renamed Extended Functions module.)
 ; *
               .public ALLOK
 ALLOK:        abex                  ; no errors at this point
@@ -1377,7 +1390,9 @@ ALPDEF:       c=stk                 ; get right def
               lc      1             ; build adr in ROM 4
               rcr     11            ; move to mantissa
 END2:         acex                  ; save in A
-              gosub   CLLCDE        ; enable and clear LCD
+; * Entry point valid for HP-41CX
+              .public END2CX
+END2CX:       gosub   CLLCDE        ; enable and clear LCD
               acex
               gosub   PROMF2
               gosub   LEFTJ         ; left-justify string
@@ -1402,7 +1417,9 @@ QUTCAT:       c=regn  14            ; catalog finish
               st=c
               s5=     0
               c=st
-              rcr     6
+; * Entry point added for HP-41CX
+              .public QUTCX
+QUTCX:        rcr     6
               st=c
               s1=     0
               goto    KBD

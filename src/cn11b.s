@@ -4,7 +4,7 @@
 ;;; Original file CN11B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @26000-27777
 ; * CONTENTS:
@@ -155,7 +155,9 @@ COLON:        ldi     0x80
 COMMA:        ldi     0xc0
               goto    PUNC
 ASCLCD:       a=c     x
-              a=0     xs
+; * Entry point added for HP-41CX
+              .public ASCLCA
+ASCLCA:       a=0     xs
               ldi     0x3a
               ?a#c    x             ; is this a colon ?
               gonc    COLON         ; yes
@@ -1172,5 +1174,5 @@ OUTROM:       gosub   MESSL
 ; * trailer.
 
               .fillto 0x3FE
-REVLV2:       .con    6             ; REV level= F
+REVLV2:       .con    12            ; REV level= L
 CKSUM2:       .con    0000

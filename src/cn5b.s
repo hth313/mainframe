@@ -4,7 +4,7 @@
 ;;; Original file CN5B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @12000-13777
 ; *

@@ -4,7 +4,7 @@
 ;;; Original file CN3B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @6000-7777
 ; *
@@ -264,9 +264,15 @@ PARS57:       pt=     0             ; save PTEMP2 in G
               m=c                   ; save XADR in M
               stk=c                 ;  and on subr stack
               cxisa                 ; get C(XADR)
+#if defined(HP41CX)
+              golong  LB_38D6
+#else
               ?c#0    x             ; not XKD?
               goc     PARS70        ; not XKD.
-              c=regn  14
+#endif
+; * Entry point added for HP-41CX
+              .public PARS59
+PARS59:       c=regn  14
               st=c                  ; put up SS0
               rtn                   ; go execute immediately
 
@@ -295,6 +301,8 @@ PARS60:
                                     ; is already known in M
               golong  NULT_5
 
+; * Entry point added for HP-41CX
+              .public PARS70
 PARS70:       s9=     0             ; initialize S9.
                                     ; S9=1 tells AXEQ & XEQNN
                                     ; that their address has
@@ -1231,5 +1239,5 @@ DONSGN:       golong  NFRX
 ; * trailer
 
               .fillto 0x3fe
-REVLEV:       .con    8             ; REV level= H
+REVLEV:       .con    14            ; REV level= N
 CKSUM0:       .con    0000

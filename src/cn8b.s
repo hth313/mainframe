@@ -4,7 +4,7 @@
 ;;; Original file CN8B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
               .SECTION QUAD8
 
@@ -777,7 +777,7 @@ XSSTR1:       gosub   DFKBCK        ; display line number
 ; *- currently pointing
 ; * USES A, B[3:0],C,M,N,PT,ST[9,7:0],4 sub levels.
 ; *
-; * See DRC'S LAB NOTEBOOK #10422X P.106 for flowchart of CLRPGM
+; * See DRC's lab notebook #10422X P.106 for flowchart of CLRPGM
 ; *
 CLRPGM:       c=regn  9             ; retrieve the name
               m=c                   ; save for ASRCH
@@ -822,7 +822,7 @@ CLPERR:       golong  ERRNE         ; error exit
 ; * NOTE, will NOT delete the final END!
 ; * USES A,B,C,M,N,ST[9:0],PT
 ; *
-; * See DRC'S LAB NOTEBOOK #10422X P.107 for flowchart of DELNNN and
+; * See DRC's lab notebook #10422X P.107 for flowchart of DELNNN and
 ; *     XDELET.
 ; *
 DELNNN:       acex                  ; store # to delete -1 in N
@@ -909,8 +909,12 @@ ERRSUB:       gosub   RSTMS0        ; enable chip 0 and
               rtn nc                ; no
               s2=     0             ; reset error flag
               c=st
+#if defined(HP41CX)
+              gosub   LB_36B7       ; also enable bank 1
+#else
               rcr     7
               regn=c  14
+#endif
 ERRTN:        goto    XDELEX
 
 ERROR:        gosub   ERRSUB
@@ -923,7 +927,11 @@ ERR110:       ?s13=1                ; running ?
               gonc    ERR130        ; no
 ERR120:       gosub   BSTEP
 ERR130:
+#if defined(HP41CX)
+              gosub   STOPS1        ; enable bank 1, clear PAUSEFLAG & RUNNING
+#else
               gosub   STOPS         ; clear PAUSEFLAG & RUNNING
+#endif
               gosub   LINNUM        ; guarantee valid line number
                                     ; for PARSE in PRGM mode
               goto    ERRTN

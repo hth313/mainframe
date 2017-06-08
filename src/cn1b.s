@@ -4,7 +4,7 @@
 ;;; Original file CN1B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @2000-3777
 
@@ -621,6 +621,8 @@ GENN40:       rcr     1             ; copy digit string to A.M
               b=a     s             ; copy # of digits to B.S
               rcr     13            ; left-justify digit string in C
               pt=     0             ; as advertised for exit
+; * Entry point added for HP-41CX
+              .public GENN55
 GENN55:       a=a-1   s
               rtn c
               ldi     0x3
@@ -955,7 +957,14 @@ RAK110:       n=c                   ; save string in N
               rcr     12
               gosub   STORFC
               s2=     0             ; RAM
-`NM44@X`:     golong  NAM44_
+`NM44@X`:
+#if defined(HP41CX)
+; * Correction made in HP-41CX, just turn off shift in the display before
+; * going to NAM44_
+              golong  LB_3B10
+#else
+              golong  NAM44_
+#endif
 
 ; * OFSHFT - turn off shiftset and shift annunciator
 ; * Requires chip 0 enabled on input
@@ -970,7 +979,10 @@ OFSHFT:       c=regn  14
               cstex
               rcr     13
               regn=c  14
-              gosub   ENLCD
+; * Entry point added for HP-41CX
+              .public OFSHFT10
+; * Just turn off shift in the display
+OFSHFT10:     gosub   ENLCD
               readen
               cstex
               s7=     0             ; reset bit for shift annunciator

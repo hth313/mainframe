@@ -4,7 +4,7 @@
 ;;; Original file CN7B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
               .section QUAD7
 

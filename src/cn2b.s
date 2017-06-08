@@ -4,7 +4,7 @@
 ;;; Original file CN2B
 ;;;
 
-        #include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @4000-5777
 
@@ -81,15 +81,26 @@ RMAD10:       cxisa                 ; read ID from one port
               gonc    RMAD20        ; yes
 RMAD15:       c=c+1   pt            ; addr _ addr + hex 1000
               gonc    RMAD10        ; check another port
+#if defined(HP41CX)
+; * Extend search to page 3 for HP-41CX. Note that this pushes the RMAD20
+; * label down one position, but we regain sync by removing the bug fix
+; * nop a few lines down.
+              golong  RMAD_PAGE3    ; search page 3 FAT
+#else
               rtn                   ; ROM not plugged in
+#endif
 RMAD20:       c=c+1   m             ; point to 2nd word of ROM
               c=b     x             ; load the FC #
               a=c
               cxisa                 ; load # of FC's in the ROM
+#if ! defined(HP41CX)
               nop                   ;  (deleted bug) 12/8/91 WCW
+#endif
               ?a<c    x             ; is the FC in the ROM ?
               gonc    RMAD30        ; no, FC # too big
-              acex    x             ; C.X _ FC #
+; * Entry point added for HP-41CX
+              .public RMAD25
+RMAD25:       acex    x             ; C.X _ FC #
               c=c+c   x             ; multiply FC # by 2
               a=a+1   m             ; point to beginning of FC table
               c=0     m
@@ -1014,7 +1025,23 @@ VIEW40:       slsabc
 ; * This is the start of the catalog routine.
 ; * Catalog 2 displays plug-in rom functions.
 ; *************************************************************
-CAT2:         c=0
+CAT2:
+#if defined(HP41CX)
+; * Jump to page 3 to preserve CAT2 entry point
+              golong  CAT2_
+              nop
+; * Entry point valid for HP-41CX
+              .public CAT2CX_10
+CAT2CX_10:
+              ?s0=1
+              gonc    GTCNTR
+              golong  BSTCT1
+; * Entry point added for HP-41CX
+              .public CAT2CX_20
+CAT2CX_20:
+
+#else
+              c=0
               abex    x
               a=a-1   x             ; get number
               c=c+1   m             ; ADDR= 2nd word of ROM
@@ -1026,6 +1053,7 @@ NXTROM:       c=c+1   pt            ; ADDR= 2nd word of next ROM
               cxisa                 ; get 2nd word= # functions
               a=a-c   x
               gonc    NXTROM
+#endif
               a=a+c   x             ; a is number in ROM
               a=0     m             ; add A to strt def adrs
               acex
@@ -1046,6 +1074,10 @@ NXTROM:       c=c+1   pt            ; ADDR= 2nd word of next ROM
               c=c+a   pt
               c=c+c   xs
               c=c+c   xs
+#if defined(HP41CX)
+              ?b#0    s
+              gonc    LB_0B7C
+#endif
               c=c+c   xs
               goc     USLNG         ; uslng code
               rcr     9             ; micro done
@@ -1056,6 +1088,12 @@ USLNG:
               s2=     1
               gosub   TXTLB1
               golong  END3
+
+#if defined(HP41CX)
+LB_0B7C:      c=c+c   xs
+              goc     CAT2CX_10
+              golong  LB_321D
+#endif
 
 ; ****************************************************
 ; * Catalog subroutines and entry logic.
@@ -1085,13 +1123,24 @@ BSTCNT:       b=c     x             ; save entry #
               c=c-1   s             ; check for cat 1
               goc     CAT1
               c=c-1   s             ; check for cat 2
+#if defined(HP41CX)
+              golc    CAT2CX
+              golong  CXCAT
+#else
               golc    CAT2
               golong  CAT3
+#endif
 ; ******************************************************
 CNTLOP:       ldi     0x100         ; load time-out constant
 KPCNT:        bcex
               chk kb
               gonc    DECCNT
+#if defined(HP41CX)
+              gosub   CAT_STOP
+              ?a#c    x             ; R/S key?
+              golnc   CLCTMG        ; clear catalog and message
+              b=0     pt
+#else
               c=keys
               rcr     3
               c=0     xs
@@ -1102,17 +1151,19 @@ KPCNT:        bcex
               ldi     135           ; R/S key?
               ?a#c    x
 XCCTMG:       golnc   CLCTMG        ; clear catalog and message
+#endif
 RSTKBD:       rst kb
 DECCNT:       bcex
               c=c-1   x
               gonc    KPCNT
               goto    GTCNTR
+              .fillto 0x3b4
 SSTCAT:       gosub   SETSST        ; set SST flag
               goto    GTCNTR        ; inc cnt in B
 R_SCAT:       gosub   RSTKB         ; clear keyboard
               goto    GTCNTR
 BSTCAT:       gosub   SETSST        ; set SST flag
-              s0=     1             ; set BST flag
+BSTCT1:       s0=     1             ; set BST flag
               c=regn  8
               rcr     10            ; BST counter
               c=c-1   x
@@ -1154,7 +1205,11 @@ OVRROT:       gosub   PUTPCD
               gosub   CLLCDE
               s1=     0             ; no scrolling
               gosub   DF060
+#if defined(HP41CX)
+              golong  CAT_END3
+#else
               golong  END3
+#endif
 ; ***********************************************
 ; * This code finishes register arithmetic.
 ; ***********************************************

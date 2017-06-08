@@ -4,7 +4,7 @@
 ;;; Original file CN6B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
               .SECTION QUAD6
 

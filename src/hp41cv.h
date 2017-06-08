@@ -1,10 +1,8 @@
-
 ;;; LEGAL appears to be a directive that says I know what
 ;;; I am doing with carry here. Not implemented by asnut,
 ;;; so we just accept it.
 
 #define legal
-
 
 ;;; Printer entry points
 PRT1:         .equlab 0X6FED
@@ -29,17 +27,20 @@ xdef          .macro X
 
               .extern ABS, ACOS, AD1_10, AD2_10, AD2_13, ADDONE, ADRFCH, ADVNCE
               .extern AFORMT, AGTO, ALCL00, ALPDEF, ANNOUT, ANN_14, AOFF, AON
-              .extern APND10, APNDDG, APNDNW, APND_, ARCL, ARGOUT, ASCLCD
+              .extern ALLOK
+              .extern APND10, APNDDG, APNDNW, APND_, ARCL, ARGOUT, ASCLCD, ASCLCA
               .extern ASHF, ASIN, ASN, ASRCH, ASTO, ATAN, AVAILA, AVIEW, AXEQ
-              .extern BAKAPH, BCDBIN, BEEP, BLINK, BRT100, BST, BSTCAT
-              .extern BSTEP, BSTEPA
+              .extern BAKAPH, BCDBIN, BEEP, BLINK, BLINK1, BRT100, BST, BSTCAT
+              .extern BSTEP, BSTEPA, BIND25
               .extern CALDSP, CAT, CAT3, CF, CHKADR, CHKRPC, CHK_NO_S
               .extern CHK_NO_S2, CHS, CLA, CLCTMG, CLDSP, CLLCDE, CLP, CLR
               .extern CLREG, CLRPGM, CLRSB2, CLRSB3, CLSIG, CLST, CLX
+              .extern CLRLCD
               .extern CNTLOP, COLDST, COPY, COS, CPGMHD
               .extern DAT106, DAT231, DAT320, DATENT, DATOFF, DCPL00, DCPLRT
               .extern DCRT10, DEC, DECAD, DECADA, DECMPL, DEG, DEL, DELETE
               .extern DELLIN, DELNNN, DERUN, DF060, DF150, DFILLF, DFKBCK
+              .extern DIGENT
               .extern DFRST8, DFRST9, DGENS8, DIGST_, DIV120, DIV15, DIVIDE
               .extern DRSY05, DRSY25, DRSY50, DRSY51, DSE, DSPCRG, DTOR
               .extern DV1_10, DV2_10, DV2_10, DV2_13, D_R
@@ -47,9 +48,12 @@ xdef          .macro X
               .extern ERR120, ERRAD, ERRDE, ERRIGN, ERRNE, ERROF, ERROR, EXP10
               .extern EXSCR, E_TO_X, E_TO_X_MINUS_1
               .extern FACT, FC, FC_C, FIX, FIXEND, FLINK, FLINKA, FLINKP
-              .extern FORMAT, FRAC, FS, FSTIN, FS_C
+              .extern FNDEND
+              .extern FORMAT, FRAC, FS, FSTIN, FS_C, FILLXL, CPGM10
               .extern GCPKC, GENLNK, GENNUM, GETLIN, GETPC, GETPCA, GRAD
               .extern GT3DBT, GTACOD, GTAINC, GTBYT, GTBYTA, GTBYTO, GTFEND
+              .extern GCPKC0
+              .extern RMAD25
               .extern GTLINK, GTLNKA, GTO, GTOL, GTONN, GTO_5, GTRMAD
               .extern HMS_H, HMS_MINUS, HMS_PLUS, H_HMS
               .extern INBYT, INBYT0, INCAD, INCAD2, INCADA, INCADP, INCGT2
@@ -73,6 +77,26 @@ xdef          .macro X
               .extern POWER_OF_TEN, PROMF1, PROMF2, PROMPT, PSE, PSESTP
               .extern PTBYTA, PTBYTM, PTLINK, PUTPC, PUTPCD, PUTPCL, PUTPCX
               .extern P_R
+              .extern PCTOC
+              .extern RMCK10
+              .extern GOTINT
+              .extern SIZSUB
+              .extern PROMFC
+              .extern GENN55
+              .extern MSG105
+              .extern QUTCX
+              .extern SARO55
+              .extern PARS59
+              .extern PARS70
+              .extern GTCNTR
+              .extern DRSY30
+              .extern APPEND
+              .extern ERR110
+              .extern ERRSUB
+              .extern GENN55
+              .extern MPY150
+              .extern RSTSQ
+              .extern STMSGF
               .extern QUTCAT
               .extern RAD, RAK60, RCL, RCSCR, RCSCR_, RDN, RFDS55, RG9LCD
               .extern RMCK05, RND, ROLBAK, ROLLUP, ROMCHK, ROMH05, ROMH35
@@ -82,6 +106,7 @@ xdef          .macro X
               .extern SAVRTN, SCI, SCROL0, SD, SEARCH, SEPXY, SETSST, SF
               .extern SHF10, SHF40, SHIFT, SIGMA, SIGMA_MINUS, SIGMA_PLUS
               .extern SIGN, SIGREG, SIN, SINFR, SIZE, SKPDEL, SKPLIN, SQR10
+              .extern SKP, NOSKP
               .extern SQR13, SQRT, SRBMAP, SST, SSTCAT,STAYON, STBT10, STBT30
               .extern STBT31, STDEV, STFLGS, STO, STOLCC, STOP, STOPS, STOPSB
               .extern STORFC, STOST0, STO_DIVIDE, STO_MINUS, STO_MULTIPLY

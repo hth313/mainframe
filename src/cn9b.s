@@ -4,7 +4,7 @@
 ;;; Original file CN9B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 ; * HP41C mainframe microcode addresses @22000-23777
 ; *
@@ -706,9 +706,15 @@ SARO15:       pt=     6             ; adjust addr
               c=b     m             ; -
               c=c+1   pt            ; -
               gonc    SARO11        ; -
+#if defined(HP41CX)
+              golong  LB_3879
+              .public LB_263C
+LB_263C:      enrom1
+#else
               lc      1             ; load main addr - 1 (11777 OCT)
               lc      3
               lc      15
+#endif
               lc      15
               s5=     1             ; search mainframe table now
 SARO20:       pt=     1             ; C[6:3]_LBL addr
@@ -818,6 +824,8 @@ SARO48:       rcr     4             ; get nxt entry
 SARO50:       ?a#0    wpt           ; end of chars?
               goc     SARO48        ; nope
               s9=     1             ; ucode_true
+; * Entry point added for HP-41CX
+              .public SARO55
 SARO55:       c=n                   ; C[3:0]_ADDR & F.C.
 ; * Next two instructions (PT=7,LC 0) may not be necessary.
               pt=     7             ; -
@@ -1282,8 +1290,12 @@ RMCK10:       pt=     6
               .public RMCK15
 RMCK15:       c=c+1   pt
               gonc    RMCK20
+#if defined(HP41CX)
+              golong  RMCK03        ; inspect page 3 poll vector
+#else
               rcr     4
               gotoc                 ; return to calling PGM
+#endif
 
 RMCK20:       cxisa
               ?c#0    x

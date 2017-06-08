@@ -4,7 +4,7 @@
 ;;; Original file CN10B
 ;;;
 
-#include "hp41cv.h"
+#include "mainframe.h"
 
 
               .SECTION QUAD10
@@ -194,7 +194,7 @@ INBEX:        ?b#0    wpt
               rtn                   ; done
 INLIN:        gosub   AVAIL         ; check if empty reg. available
 NROOM:        ?c#0                  ; empty register?
-              gonc    NOROOM        ; no, error exit
+              gonc    NROOM0        ; no, error exit
 ; * Insert assured here.
               gosub   FLINKM        ; find links to fix up chain
               gosub   FIXEND        ; fix up END
@@ -249,7 +249,7 @@ INL3:         c=c+1                 ; move registers down
               data=c                ; 1 or more nulls
               c=m                   ; go back and finish the insert
               golong  INBYT1
-NOROOM:       c=m                   ; no room - error exit
+NROOM0:       c=m                   ; no room - error exit
               a=c     wpt           ; zero previously inserted steps
               goto    NROOM2
 NROOM1:       gosub   DECADA
