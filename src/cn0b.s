@@ -53,6 +53,7 @@
               .public NFRX
               .public NFRXY
               .public QUTCAT
+              .public ROW10
               .public RUNNK
               .public STMSGF
               .public TONSTF
