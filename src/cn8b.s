@@ -263,7 +263,7 @@ PKEND3:       c=m                   ; let GENLNK put the link in
               gosub   GENLNK
 PKEND5:       dadd=c                ; put last byte of .END. in place
               c=data
-              pt=   0
+              pt=     0
               c=g
               data=c
 ; *
@@ -578,7 +578,7 @@ PATCH1:       a=a+1   pt
 ; * when the program counter is pointing to ROM.
 ; *
               .public PATCH2
-PATCH2:       s10=  0               ; clear ROM flag
+PATCH2:       s10=    0             ; clear ROM flag
               gosub   FIXEND        ; get the 3rd byte of the current END
               c=b     wpt
               cstex                 ; turn off the private bit.

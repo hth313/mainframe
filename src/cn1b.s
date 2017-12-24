@@ -453,7 +453,7 @@ DF100:        gosub   NXTBYT        ; next byte
 ; * Uses one additional subroutine level and uses C[6:0] - see
 ; *     MEMLFT for additional register usage
 ; *
-              .PUBLIC REGLFT
+              .public REGLFT
 REGLFT:       gosub   MESSL
               .con    32            ; blank
               .con    18            ;  R
@@ -670,7 +670,7 @@ AFMT12:       lc      3
               ldi     0x2c          ; comma
               goto    2$
 1$:           ldi     0x2e          ; D.P.
-2$:           dec     pt
+2$:           dec pt
               sel p
               gosub   APND10
               goto    AFMT10

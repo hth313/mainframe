@@ -1091,7 +1091,7 @@ NAME4A:       c=regn  14
               acex                  ; bring back FC to C
               s9=     0             ; restore S9=0
                                     ; (not an auto-reassigned FCN)
-              golong PARS56
+              golong  PARS56
 
 NAME4C:
 ; * We come to NAME4C from ASRCH in the AXEQ logic

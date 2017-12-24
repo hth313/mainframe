@@ -692,7 +692,7 @@ EXP720:       ?s7=1
               a=c     s
 EXP730:       golong  NRM13
 EXP410:       c=c+1   pt
-EXP420:       a=a-b w
+EXP420:       a=a-b   w
               gonc    EXP410
               a=a+b   w
               ?pt=    6
@@ -737,7 +737,7 @@ EXP520:       c=c+1   x
 EXP540:       bsr     w
 EXP530:       c=c-1   s
               gonc    EXP540
-              a=a+b w
+              a=a+b   w
               a=a+1   s
               c=m
               goto    EXP560

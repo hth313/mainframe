@@ -1172,7 +1172,7 @@ GCPK10:       c=c+1   x             ; -
               dadd=c                ; C_reg
               n=c                   ; -
               c=data                ; -
-              c=c+1 s               ; end ASNs?
+              c=c+1   s             ; end ASNs?
               gonc    GCPK05        ; yes
               c=c-1   s             ; -
               a=c     s             ; -

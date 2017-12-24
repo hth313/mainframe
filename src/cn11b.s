@@ -1014,8 +1014,8 @@ TBITMP:       pt=     2             ; C[2]_4
               s0=     1             ; -
 1$:           pt=     5             ; position ptr at column
               goto    2$            ; -
-3$:           inc     pt            ; -
-              inc     pt            ; -
+3$:           inc pt                ; -
+              inc pt                ; -
 2$:           a=a-1   xs            ; -
               gonc    3$            ; -
               asl     x             ; A[2]_row

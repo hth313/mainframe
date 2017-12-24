@@ -402,7 +402,7 @@ RFDS20:       ?s5=1                 ; load the D.P. to C
               lc      7
               goto    2$
 1$:           lc      15
-2$:           inc     pt            ; restore the pointer
+2$:           inc pt                ; restore the pointer
 RFDS25:       ?s4=1                 ; grouping flag set ?
               gonc    RFDS35        ; no
               ?pt=    13
