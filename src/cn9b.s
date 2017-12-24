@@ -1148,7 +1148,7 @@ XASN02:       gsblng  SRBMAP        ; set bit
               rcr     4             ; -
               bcex                  ; -
               ?s2=1                 ; place in RAM?
-              goc     XASN05        ; NOPE
+              goc     XASN05        ; nope
               c=regn  9             ; C[3:0]_ALBL address
               acex                  ; yes
               rcr     2             ; -
@@ -1183,7 +1183,7 @@ XASN05:       gsblng  GCPKC         ; place K.C. & F.C.
               acex    wpt           ; -
               rcr     2             ; -
               c=c-1   s             ; -
-              bcex                  ; B_REG to insert
+              bcex                  ; B_reg to insert
               gsblng  AVAILA        ; any room?
               ?c#0                  ; -
               goc     ASN15         ; yes

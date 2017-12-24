@@ -130,7 +130,7 @@ FatEnd:       .con    0, 0
   -------------------------------------------
    D                 C        B        A
 
-  A - file size in numeber of registers (not including the file name
+  A - file size in number of registers (not including the file name
       and header register)
   B - for program file = program length in number of bytes
       for data file    = current register pointer
@@ -991,7 +991,7 @@ LB_33EE:      s3=     1
 ;;; *       Extended Functions to not clear the file number,
 ;;; *       but rather load current file number to C.X
               .public `CUR#`
-`CUR#`:       ldi     0x40     ; select base module link register
+`CUR#`:       ldi     0x40          ; select base module link register
               dadd=c
               c=data
               rcr     9             ; current file to C.X
@@ -1216,7 +1216,7 @@ ADVADR:       gosub   ENRGAD        ; get lowest reg addr of current module
               a=a-1   pt            ; point to byte addr in next reg
               legal
               goto    ADVAD1        ; advance one more reg
-ADVA20:       a=a-c   x             ; A.X = remaining regs to to -1
+ADVA20:       a=a-c   x             ; A.X = remaining regs to go -1
               abex    x             ; A = start addr, B = regs to go
               gosub   NXTMDL        ; get addr of next module
               ?a#0    x             ; is there a next module ?
@@ -2572,7 +2572,7 @@ CLFL:         b=0     s
 ;;; **********************************************************************
 ;;; * FLSHAP - get file entry
 ;;; *   input  : S0=0 - get current file entry
-;;; *            s0=1 - get file entry by its name in the alpga register
+;;; *            s0=1 - get file entry by its name in the alpha register
 ;;; *                   if alpha is empty, it will default to current file
 ;;; * FLSHAB - special entry point
 ;;; * FLSHAC - special entry point
@@ -2583,7 +2583,7 @@ CLFL:         b=0     s
 
 FLSHAP:       b=0     s
               ?s0=1                 ; want current file ?
-              gonc    FSA10        ; yes
+              gonc    FSA10         ; yes
 FLSHAB:       c=regn  5
               ?c#0                  ; alpha empty ?
 FSA10:        golong  CURFL         ; yes, default to current file
@@ -3052,7 +3052,7 @@ EFLS20:       cmex                  ; C=addr, M=target name
               gonc    EFLS30        ; no
               c=c-1
               m=c                   ; save the file name in M
-EFLS30:       gosub   ADVAD1     ; point to next register
+EFLS30:       gosub   ADVAD1        ; point to next register
               ?s2=1                 ; memory discontinuity ?
               goc     EFLS70        ; yes
               c=a     x

@@ -1092,7 +1092,7 @@ GETAS2:       gosub   GTFLNA        ; get source file name
               ?s6=1                 ; destination file name the same as source ?
               gonc    RDT120        ; yes
               gosub   ALNAM2        ; get destination file name
-RDT120:       gosub   FSCHT     ; search for the text file
+RDT120:       gosub   FSCHT         ; search for the text file
               c=n
               rcr     10
               dadd=c                ; enable file header register
@@ -1110,7 +1110,7 @@ RDT120:       gosub   FSCHT     ; search for the text file
               gosub   SNDATA        ; start to send data
               c=m
               a=c     wpt           ; A[3:0]= last destination byte addr
-RDT130:       gosub   NXCHR     ; point to next byte
+RDT130:       gosub   NXCHR         ; point to next byte
               c=m
               c=a     wpt
               m=c
