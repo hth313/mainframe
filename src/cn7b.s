@@ -349,7 +349,7 @@ XBAR_:        a=c     w
               dadd=c
               bcex    w
               golong  DV2_10
-              .public XBAR
+              .public XBAR_
               .public SD
 SD:           s5=     0
               gosub   STATCK
