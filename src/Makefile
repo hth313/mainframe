@@ -7,7 +7,7 @@ SRCS_CX = $(SRCS_CV) extfuns.s time.s extfuns2.s
 OBJS_CX = $(SRCS_CX:%.s=%-cx.o)
 MOD_CX = 41cx.mod
 
-all: $(MOD_CX)
+all: $(MOD_CX) $(MOD_CV)
 
 %-cv.o: %.s
 	asnut -g -l$(*F)-cv.lst $< -o$@
