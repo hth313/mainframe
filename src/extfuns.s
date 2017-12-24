@@ -161,19 +161,19 @@ FatEnd:       .con    0, 0
 #endif
               .name   "CLKEYS"
 ;;; The goto-next-line instruction that appear before enromX is because
-;;; the ROM chip used (HP part no 1LG9) requires that the enromX is
+;;; the ROM chip used (HP part no. 1LG9) requires that the enromX is
 ;;; preceded by an instruction whose high bit is zero. This is customarily
 ;;; handled by placing a goto-next-line instruction before the enromX.
 ;;; Ref: HP SDS-II manual page 39.
-CLKEYS:       goto    1$
-1$:           enrom2
+CLKEYS:       goto    .+1
+              enrom2
               golong  CLKEYS2
 
               .name   "-EXT FCN 2D"
 Header:
               .name   "ASROOM"
-ASROOM:       goto    1$
-1$:           enrom2
+ASROOM:       goto    .+1
+              enrom2
               golong  ASROOM2
 
               .name   "-CX EXT FCN"
@@ -254,18 +254,18 @@ LB_3118:      enrom2
               golong  PASN10
 
               .name   "X=NN?"
-`X=NN?`:      goto    1$
-1$:           enrom2
+`X=NN?`:      goto    .+1
+              enrom2
               golong  `X=NN? 2`
 
               .name   "X≠NN?"
-`X≠NN?`:      goto    1$
-1$:           enrom2
+`X≠NN?`:      goto    .+1
+              enrom2
               golong  `X≠NN? 2`
 
               .name   "X<NN?"
-`X<NN?`:      goto    1$
-1$:           enrom2
+`X<NN?`:      goto    .+1
+              enrom2
               golong  `X<NN? 2`
 
 ;;; **********************************************************************
@@ -429,13 +429,13 @@ ADR608:       c=0
 ANUM:         gosub   FAHED         ; get address of alpha head
               ?s2=1                 ; alpha empty?
               rtn c                 ; yes, don't do anything
-              goto    1$
-1$:           enrom2
+              goto    .+1
+              enrom2
               golong  ANUM2
 
               .name   "AROT"
-AROTAT:       goto    1$
-1$:           enrom2
+AROTAT:       goto    .+1
+              enrom2
               golong  AROT2
 
 ;;; **********************************************************************
@@ -452,15 +452,15 @@ ENB1GO:       c=stk      ; pointer is after the call to here
               c=c+1   m             ; point to address of upper 8 bit
               cxisa                 ; read upper part
               rcr     9             ; put address in C[6:3] address field
-              goto    1$
-1$:           enrom1                ; enable bank 1
+              goto    .+1
+              enrom1                ; enable bank 1
               gotoc                 ; go
 
 ;;; **********************************************************************
 ;;; * TOBNK1 - return to bank 1
               .public TOBNK1
-TOBNK1:       goto    1$
-1$:           enrom1
+TOBNK1:       goto    .+1
+              enrom1
               rtn
 
               .public RMAD_PAGE3
@@ -537,8 +537,8 @@ LB_321D:      rcr     9
 LB_3234:      golong  BSTCAT
 
               .name   "X<=NN?"
-`X<=NN?`:     goto    1$
-1$:           enrom2
+`X<=NN?`:     goto    .+1
+              enrom2
               golong  `X<=NN? 2`
 
 ;;; **********************************************************************
@@ -684,21 +684,21 @@ CHKLB2:       ?lld                  ; low battery ?
               goto    TGLS30
 
               .name   "POSA"
-POSA:         goto    1$
-1$:           enrom2
+POSA:         goto    .+1
+              enrom2
               golong  POSA2
 
-XPOANF:       goto    1$            ; go to CX function in ROM 5.2
-1$:           enrom2
+XPOANF:       goto    .+1           ; go to CX function in ROM 5.2
+              enrom2
               golong  XPOANF2
 
-XPOAFN:       goto    1$            ; go to CX function in ROM 5.2
-1$:           enrom2
+XPOAFN:       goto    .+1           ; go to CX function in ROM 5.2
+              enrom2
               golong  XPOAFN2
 
               .public RMCK10_B1
-RMCK10_B1:    goto    1$            ; enable bank 1 and to to RMCK10
-1$:           enrom1
+RMCK10_B1:    goto    .+1           ; enable bank 1 and to to RMCK10
+              enrom1
               golong  RMCK10
 
               .public LB_32C5
@@ -708,8 +708,8 @@ LB_32C5:      a=0     pt            ; lifted out from ALMBST
               rtn
 
               .name   "X>NN?"
-`X>NN?`:      goto    1$
-1$:           enrom2
+`X>NN?`:      goto    .+1
+              enrom2
               golong  `X>NN? 2`
 
 ;;; from DSPA80
@@ -845,8 +845,8 @@ RCLFLAG:      c=regn  14            ; get status register
               golong  RCL
 
               .name   "STOFLAG"
-STOFLAG:      goto    1$
-1$:           enrom2
+STOFLAG:      goto    .+1
+              enrom2
               golong  STOFLAG2
 
               nop
@@ -867,8 +867,8 @@ CAT_STOP:      c=keys
               rtn
 
               .name   "GETKEY"
-GETKEY:       goto    1$
-1$:           enrom2
+GETKEY:       goto    .+1
+              enrom2
               golong  GETKEY2
 
               .public DDATE2
@@ -919,13 +919,13 @@ DDAYS2:       s1=     1             ; add X or Y to "DATA ERROR"
               goto    `DT+10`
 
               .name   "PCLPS"
-PCLPS:        goto    1$
-1$:           enrom2
+PCLPS:        goto    .+1
+              enrom2
               golong  PCLPS2
 
               .name   "CLRGX"
-CLRGX:        goto    1$
-1$:           enrom2
+CLRGX:        goto    .+1
+              enrom2
               golong  CLRGX2
 
               .name   "X<>F"
@@ -1480,8 +1480,8 @@ GETREC:       s7=     1
               .public ARCLRC
               .name   "ARCLREC"
 ARCLRC:       s7=     0
-GTRC05_1:     goto    1$
-1$:           enrom2
+GTRC05_1:     goto    .+1
+              enrom2
               golong  GTRC05
 
               .public LB_3581, LB_3583
@@ -1688,8 +1688,8 @@ UPRCAB:       c=n
 
               .name   "SAVEAS"
               .public SAVEAS
-SAVEAS:       goto    1$
-1$:           enrom2
+SAVEAS:       goto    .+1
+              enrom2
               golong  SAVEAS2
 
               .public SWPT2
@@ -1740,8 +1740,8 @@ LB_3659:      acex    x
               golong  LB_556C
 
               .name   "X>=NN?"
-`X>=NN?`:     goto    1$
-1$:           enrom2
+`X>=NN?`:     goto    .+1
+              enrom2
               golong  `X>=NN? 2`
 
 ;;; **********************************************************************
@@ -1759,8 +1759,8 @@ FNDPIL:       c=0
               .public POSFL
 POSFL:        gosub   CURFLT
               gosub   ALEN
-              goto    1$
-1$:           enrom2
+              goto    .+1
+              enrom2
               ?c#0    x
               golnc   APOSNF
               golong  APOS10
@@ -1779,8 +1779,8 @@ LB_3698:      sethex
 
               .name   "EMROOM"
               .public EMROOM
-EMROOM:       goto    1$
-1$:           enrom2
+EMROOM:       goto    .+1
+              enrom2
               golong  EMROOM2
 
               .public GETSUB, GETP
@@ -1789,8 +1789,8 @@ GETSUB:       s9=     0
               goto    RP100
               .name   "GETP"
 GETP:         s9=     1
-RP100:        goto    1$
-1$:           enrom2
+RP100:        goto    .+1
+              enrom2
               golong  GETP2
 
               .public LB_36B7
@@ -2056,8 +2056,8 @@ LB_37EE:      ?s7=1
 
               .name   "GETAS"
               .public GETAS
-GETAS:        goto    1$
-1$:           enrom2
+GETAS:        goto    .+1
+              enrom2
               golong  GETAS2
 
               .fillto 0x800
@@ -2155,8 +2155,8 @@ SAPH10:       ?a<c    wpt           ; enough room
 
               .public SAVEP
               .name   "SAVEP"
-SAVEP:        goto    1$
-1$:           enrom2
+SAVEP:        goto    .+1
+              enrom2
               golong  SAVEP2
 
 ;;; Parto of ALM060
@@ -2167,8 +2167,8 @@ LB_3863:      ?s4=1                 ; called from ALMNOW?
               gosub   ALM200
               golong  ALM070
 
-              goto    1$
-1$:           enrom2
+              goto    .+1
+              enrom2
               golong  RSTKCA
 
               .public LB_386F
@@ -2452,8 +2452,8 @@ LB_399A:      regn=c  1
 
               .name   "ED"
               .public ED
-ED:           goto    1$
-1$:           enrom2
+ED:           goto    .+1
+              enrom2
               golong  ED2
 
               .public CRFLD, CRFLAS
@@ -2775,8 +2775,8 @@ PUTA30:       ?s6=1                 ; write end of text mark ?
 
               .name   "RESZFL"
               .public RESZFL
-RESZFL:       goto    1$
-1$:           enrom2
+RESZFL:       goto    .+1
+              enrom2
               golong  RESZFL2
 
 ;;; **********************************************************************
@@ -2839,8 +2839,8 @@ MKRM40:       a=a+1   x
 
               .name   "GETKEYX"
               .public GETKEYX
-GETKEYX:      goto    1$
-1$:           enrom2
+GETKEYX:      goto    .+1
+              enrom2
               golong  GETKEYX2
 
               .public NOREGCX
