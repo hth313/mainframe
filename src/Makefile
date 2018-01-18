@@ -16,10 +16,10 @@ all: $(MOD_CX) $(MOD_CV)
 	asnut -DHP41CX -g -l$(*F)-cx.lst $< -o$@
 
 $(MOD_CX): $(OBJS_CX) 41cx.scm 41cx.moddesc
-	lnnut -g $(OBJS_CX) 41cx.scm 41cx.moddesc
+	lnnut -g -l $(OBJS_CX) 41cx.scm 41cx.moddesc
 
 $(MOD_CV): $(OBJS_CV) 41cv.scm 41cv.moddesc
-	lnnut -g $(OBJS_CV) 41cv.scm 41cv.moddesc
+	lnnut -g -l $(OBJS_CV) 41cv.scm 41cv.moddesc
 
 clean:
 	-rm $(OBJS_CV) $(OBJS_CX) $(MOD_CV) $(MOD_CX) 41cv 41cx *.lst
