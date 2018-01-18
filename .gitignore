@@ -1,0 +1,6 @@
+*.o
+*.lst
+src/41cv.mod
+src/41cx.mod
+src/41cv
+src/41cx
