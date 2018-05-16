@@ -25,112 +25,518 @@ xdef          .macro X
               .con  .low10 \X
               .endm
 
-              .extern ABS, ACOS, AD1_10, AD2_10, AD2_13, ADDONE, ADRFCH, ADVNCE
-              .extern AFORMT, AGTO, ALCL00, ALPDEF, ANNOUT, ANN_14, AOFF, AON
+              .extern ABS
+              .extern ACOS
+              .extern AD1_10
+              .extern AD2_10
+              .extern AD2_13
+              .extern ADDONE
+              .extern ADRFCH
+              .extern ADVNCE
+              .extern AFORMT
+              .extern AGTO
+              .extern ALCL00
               .extern ALLOK
-              .extern APND10, APNDDG, APNDNW, APND_, ARCL, ARGOUT, ASCLCD, ASCLCA
-              .extern ASHF, ASIN, ASN, ASRCH, ASTO, ATAN, AVAILA, AVIEW, AXEQ
-              .extern BAKAPH, BCDBIN, BEEP, BLINK, BLINK1, BRT100, BST, BSTCAT
-              .extern BSTEP, BSTEPA, BIND25
-              .extern CALDSP, CAT, CAT3, CF, CHKADR, CHKRPC, CHK_NO_S
-              .extern CHK_NO_S2, CHS, CLA, CLCTMG, CLDSP, CLLCDE, CLP, CLR
-              .extern CLREG, CLRPGM, CLRSB2, CLRSB3, CLSIG, CLST, CLX
+              .extern ALPDEF
+              .extern ANNOUT
+              .extern ANN_14
+              .extern AOFF
+              .extern AON
+              .extern APND10
+              .extern APNDDG
+              .extern APNDNW
+              .extern APND_
+              .extern APPEND
+              .extern ARCL
+              .extern ARGOUT
+              .extern ASCLCA
+              .extern ASCLCD
+              .extern ASHF
+              .extern ASIN
+              .extern ASN
+              .extern ASRCH
+              .extern ASTO
+              .extern ATAN
+              .extern AVAILA
+              .extern AVIEW
+              .extern AXEQ
+              .extern BAKAPH
+              .extern BCDBIN
+              .extern BEEP
+              .extern BIND25
+              .extern BLINK
+              .extern BLINK1
+              .extern BRT100
+              .extern BST
+              .extern BSTCAT
+              .extern BSTEP
+              .extern BSTEPA
+              .extern CALDSP
+              .extern CAT
+              .extern CAT3
+              .extern CF
+              .extern CHKADR
+              .extern CHKRPC
+              .extern CHK_NO_S
+              .extern CHK_NO_S2
+              .extern CHS
+              .extern CLA
+              .extern CLCTMG
+              .extern CLDSP
+              .extern CLLCDE
+              .extern CLP
+              .extern CLR
+              .extern CLREG
               .extern CLRLCD
-              .extern CNTLOP, COLDST, COPY, COS, CPGMHD
-              .extern DAT106, DAT231, DAT320, DATENT, DATOFF, DCPL00, DCPLRT
-              .extern DCRT10, DEC, DECAD, DECADA, DECMPL, DEG, DEL, DELETE
-              .extern DELLIN, DELNNN, DERUN, DF060, DF150, DFILLF, DFKBCK
+              .extern CLRPGM
+              .extern CLRSB2
+              .extern CLRSB3
+              .extern CLSIG
+              .extern CLST
+              .extern CLX
+              .extern CNTLOP
+              .extern COLDST
+              .extern COPY
+              .extern COS
+              .extern CPGM10
+              .extern CPGMHD
+              .extern DAT106
+              .extern DAT231
+              .extern DAT320
+              .extern DATENT
+              .extern DATOFF
+              .extern DCPL00
+              .extern DCPLRT
+              .extern DCRT10
+              .extern DEC
+              .extern DECAD
+              .extern DECADA
+              .extern DECMPL
+              .extern DEG
+              .extern DEL
+              .extern DELETE
+              .extern DELLIN
+              .extern DELNNN
+              .extern DERUN
+              .extern DF060
+              .extern DF150
+              .extern DFILLF
+              .extern DFKBCK
+              .extern DFRST8
+              .extern DFRST9
+              .extern DGENS8
               .extern DIGENT
-              .extern DFRST8, DFRST9, DGENS8, DIGST_, DIV120, DIV15, DIVIDE
-              .extern DRSY05, DRSY25, DRSY50, DRSY51, DSE, DSPCRG, DTOR
-              .extern DV1_10, DV2_10, DV2_10, DV2_13, D_R
-              .extern ENCP00, END, END2, END3, ENG, ENLCD, ENTER, ERR0
-              .extern ERR120, ERRAD, ERRDE, ERRIGN, ERRNE, ERROF, ERROR, EXP10
-              .extern EXSCR, E_TO_X, E_TO_X_MINUS_1
-              .extern FACT, FC, FC_C, FIX, FIXEND, FLINK, FLINKA, FLINKP
+              .extern DIGST_
+              .extern DIV120
+              .extern DIV15
+              .extern DIVIDE
+              .extern DRSY05
+              .extern DRSY25
+              .extern DRSY30
+              .extern DRSY50
+              .extern DRSY51
+              .extern DSE
+              .extern DSPCRG
+              .extern DTOR
+              .extern DV1_10
+              .extern DV2_10
+              .extern DV2_10
+              .extern DV2_13
+              .extern D_R
+              .extern ENCP00
+              .extern END
+              .extern END2
+              .extern END3
+              .extern ENG
+              .extern ENLCD
+              .extern ENTER
+              .extern ERR0
+              .extern ERR110
+              .extern ERR120
+              .extern ERRAD
+              .extern ERRDE
+              .extern ERRIGN
+              .extern ERRNE
+              .extern ERROF
+              .extern ERROR
+              .extern ERRSUB
+              .extern EXP10
+              .extern EXSCR
+              .extern E_TO_X
+              .extern E_TO_X_MINUS_1
+              .extern FACT
+              .extern FC
+              .extern FC_C
+              .extern FILLXL
+              .extern FIX
+              .extern FIXEND
+              .extern FLINK
+              .extern FLINKA
+              .extern FLINKP
               .extern FNDEND
-              .extern FORMAT, FRAC, FS, FSTIN, FS_C, FILLXL, CPGM10
-              .extern GCPKC, GENLNK, GENNUM, GETLIN, GETPC, GETPCA, GRAD
-              .extern GT3DBT, GTACOD, GTAINC, GTBYT, GTBYTA, GTBYTO, GTFEND
+              .extern FORMAT
+              .extern FRAC
+              .extern FS
+              .extern FSTIN
+              .extern FS_C
+              .extern GCPKC
               .extern GCPKC0
-              .extern RMAD25
-              .extern GTLINK, GTLNKA, GTO, GTOL, GTONN, GTO_5, GTRMAD
-              .extern HMS_H, HMS_MINUS, HMS_PLUS, H_HMS
-              .extern INBYT, INBYT0, INCAD, INCAD2, INCADA, INCADP, INCGT2
-              .extern INSLIN, INSSUB, INT, INTARG, INTFRC, IORUN, ISG
-              .extern KEYOP
-              .extern LASTX, LBL, LDSST0, LEFTJ, LINNUM, LN, LN10, LN1_PLUS_X
-              .extern LOAD3, LOG
-              .extern MASK, MEAN, MEMCHK, MEMLFT, MESSL, MINUS, MOD, MOD10
-              .extern MODE, MP1_10, MP2_10, MP2_13, MSG, MSGA, MSGAD, MSGDE
-              .extern MSGDLY, MSGE, MSGML, MSGNE, MSGNL, MSGNO, MSGOF, MSGPR
-              .extern MSGRAM, MSGROM, MSGTA, MSGWR, MSGYES, MULTIPLY
-              .extern NAM44_, NAME4A, NAME4D, NBYTA0, NBYTAB, NEXT1, NFRC
-              .extern NFRENT, NFRKB, NFRKB1, NFRNC, NFRPR, NFRPU, NFRSIG
-              .extern NFRST_PLUS, NFRX, NFRXY, NLT020, NM44_5
-              .extern NOREG9, NULTST, NULT_3, NWGOOS, NXBYT3, NXBYTA, NXBYTO
-              .extern NXL3B2, NXLDEL, NXLSST, NXLTX, NXTBYT
-              .extern OCT, OFF, OFSHFT, ONE_BY_X, ONE_BY_X10, ONE_BY_X13
-              .extern OPROMT, OVFL10
-              .extern P6RTN, PACH4, PACK, PACKE, PACKN, PARS56, PARSE, PATCH1
-              .extern PATCH6, PCT, PCTCH, PGMAON, PI, PI_BY_2, PKIOAS, PLUS
-              .extern POWER_OF_TEN, PROMF1, PROMF2, PROMPT, PSE, PSESTP
-              .extern PTBYTA, PTBYTM, PTLINK, PUTPC, PUTPCD, PUTPCL, PUTPCX
-              .extern P_R
-              .extern PCTOC
-              .extern RMCK10
-              .extern GOTINT
-              .extern SIZSUB
-              .extern PROMFC
+              .extern GENLNK
               .extern GENN55
+              .extern GENN55
+              .extern GENNUM
+              .extern GETLIN
+              .extern GETPC
+              .extern GETPCA
+              .extern GOTINT
+              .extern GRAD
+              .extern GT3DBT
+              .extern GTACOD
+              .extern GTAINC
+              .extern GTBYT
+              .extern GTBYTA
+              .extern GTBYTO
+              .extern GTCNTR
+              .extern GTFEND
+              .extern GTLINK
+              .extern GTLNKA
+              .extern GTO
+              .extern GTOL
+              .extern GTONN
+              .extern GTO_5
+              .extern GTRMAD
+              .extern HMS_H
+              .extern HMS_MINUS
+              .extern HMS_PLUS
+              .extern H_HMS
+              .extern INBYT
+              .extern INBYT0
+              .extern INCAD
+              .extern INCAD2
+              .extern INCADA
+              .extern INCADP
+              .extern INCGT2
+              .extern INSLIN
+              .extern INSSUB
+              .extern INT
+              .extern INTARG
+              .extern INTFRC
+              .extern IORUN
+              .extern ISG
+              .extern KEYOP
+              .extern LASTX
+              .extern LBL
+              .extern LDSST0
+              .extern LEFTJ
+              .extern LINNUM
+              .extern LN
+              .extern LN10
+              .extern LN1_PLUS_X
+              .extern LOAD3
+              .extern LOG
+              .extern MASK
+              .extern MEAN
+              .extern MEMCHK
+              .extern MEMLFT
+              .extern MESSL
+              .extern MINUS
+              .extern MOD
+              .extern MOD10
+              .extern MODE
+              .extern MP1_10
+              .extern MP2_10
+              .extern MP2_13
+              .extern MPY150
+              .extern MSG
               .extern MSG105
-              .extern QUTCX
-              .extern SARO55
+              .extern MSGA
+              .extern MSGAD
+              .extern MSGDE
+              .extern MSGDLY
+              .extern MSGE
+              .extern MSGML
+              .extern MSGNE
+              .extern MSGNL
+              .extern MSGNO
+              .extern MSGOF
+              .extern MSGPR
+              .extern MSGRAM
+              .extern MSGROM
+              .extern MSGTA
+              .extern MSGWR
+              .extern MSGYES
+              .extern MULTIPLY
+              .extern NAM44_
+              .extern NAME4A
+              .extern NAME4D
+              .extern NBYTA0
+              .extern NBYTAB
+              .extern NEXT1
+              .extern NFRC
+              .extern NFRENT
+              .extern NFRKB
+              .extern NFRKB1
+              .extern NFRNC
+              .extern NFRPR
+              .extern NFRPU
+              .extern NFRSIG
+              .extern NFRST_PLUS
+              .extern NFRX
+              .extern NFRXY
+              .extern NLT020
+              .extern NM44_5
+              .extern NOREG9
+              .extern NOSKP
+              .extern NULTST
+              .extern NULT_3
+              .extern NWGOOS
+              .extern NXBYT3
+              .extern NXBYTA
+              .extern NXBYTO
+              .extern NXL3B2
+              .extern NXLDEL
+              .extern NXLSST
+              .extern NXLTX
+              .extern NXTBYT
+              .extern OCT
+              .extern OFF
+              .extern OFSHFT
+              .extern ONE_BY_X
+              .extern ONE_BY_X10
+              .extern ONE_BY_X13
+              .extern OPROMT
+              .extern OVFL10
+              .extern P6RTN
+              .extern PACH4
+              .extern PACK
+              .extern PACKE
+              .extern PACKN
+              .extern PARS56
               .extern PARS59
               .extern PARS70
-              .extern GTCNTR
-              .extern DRSY30
-              .extern APPEND
-              .extern ERR110
-              .extern ERRSUB
-              .extern GENN55
-              .extern MPY150
-              .extern RSTSQ
-              .extern STMSGF
+              .extern PARSE
+              .extern PATCH1
+              .extern PATCH6
+              .extern PCT
+              .extern PCTCH
+              .extern PCTOC
+              .extern PGMAON
+              .extern PI
+              .extern PI_BY_2
+              .extern PKIOAS
+              .extern PLUS
+              .extern POWER_OF_TEN
+              .extern PROMF1
+              .extern PROMF2
+              .extern PROMFC
+              .extern PROMPT
+              .extern PSE
+              .extern PSESTP
+              .extern PTBYTA
+              .extern PTBYTM
+              .extern PTLINK
+              .extern PUTPC
+              .extern PUTPCD
+              .extern PUTPCL
+              .extern PUTPCX
+              .extern P_R
               .extern QUTCAT
-              .extern RAD, RAK60, RCL, RCSCR, RCSCR_, RDN, RFDS55, RG9LCD
-              .extern RMCK05, RND, ROLBAK, ROLLUP, ROMCHK, ROMH05, ROMH35
-              .extern ROMHED, ROW0, ROW11, ROW12, ROW940, RST05, RSTANN, RSTKB
-              .extern RSTMS0, RSTMS1, RSTSEQ, RTJLBL, RTN, RTN30, RTOD, RUN
-              .extern RUNING, RUNNK, RUN_STOP, R_D, R_P, R_SCAT, R_SUB
-              .extern SAVRTN, SCI, SCROL0, SD, SEARCH, SEPXY, SETSST, SF
-              .extern SHF10, SHF40, SHIFT, SIGMA, SIGMA_MINUS, SIGMA_PLUS
-              .extern SIGN, SIGREG, SIN, SINFR, SIZE, SKPDEL, SKPLIN, SQR10
-              .extern SKP, NOSKP
-              .extern SQR13, SQRT, SRBMAP, SST, SSTCAT,STAYON, STBT10, STBT30
-              .extern STBT31, STDEV, STFLGS, STO, STOLCC, STOP, STOPS, STOPSB
-              .extern STORFC, STOST0, STO_DIVIDE, STO_MINUS, STO_MULTIPLY
-              .extern STO_PLUS, STSCR, STSCR_, SUBONE, SUMCHK
-              .extern TAN, TBITMA, TBITMP, TEN_TO_X, TEXT, TGSHF1, TOGSHF
-              .extern TONE, TONE7X, TONSTF, TOOCT, TOPOL, TOREC, TRC10, TRG100
-              .extern TRGSET, TSTMAP, TXTLB1, TXTLBL, TXTROM, TXTSTR
+              .extern QUTCX
+              .extern RAD
+              .extern RAK60
+              .extern RCL
+              .extern RCSCR
+              .extern RCSCR_
+              .extern RDN
+              .extern RFDS55
+              .extern RG9LCD
+              .extern RMAD25
+              .extern RMCK05
+              .extern RMCK10
+              .extern RND
+              .extern ROLBAK
+              .extern ROLLUP
+              .extern ROMCHK
+              .extern ROMH05
+              .extern ROMH35
+              .extern ROMHED
+              .extern ROW0
+              .extern ROW11
+              .extern ROW12
+              .extern ROW940
+              .extern RST05
+              .extern RSTANN
+              .extern RSTKB
+              .extern RSTMS0
+              .extern RSTMS1
+              .extern RSTSEQ
+              .extern RSTSQ
+              .extern RTJLBL
+              .extern RTN
+              .extern RTN30
+              .extern RTOD
+              .extern RUN
+              .extern RUNING
+              .extern RUNNK
+              .extern RUN_STOP
+              .extern R_D
+              .extern R_P
+              .extern R_SCAT
+              .extern R_SUB
+              .extern SARO55
+              .extern SAVRTN
+              .extern SCI
+              .extern SCROL0
+              .extern SD
+              .extern SEARCH
+              .extern SEPXY
+              .extern SETSST
+              .extern SF
+              .extern SHF10
+              .extern SHF40
+              .extern SHIFT
+              .extern SIGMA
+              .extern SIGMA_MINUS
+              .extern SIGMA_PLUS
+              .extern SIGN
+              .extern SIGREG
+              .extern SIN
+              .extern SINFR
+              .extern SIZE
+              .extern SIZSUB
+              .extern SKP
+              .extern SKPDEL
+              .extern SKPLIN
+              .extern SQR10
+              .extern SQR13
+              .extern SQRT
+              .extern SRBMAP
+              .extern SST
+              .extern SSTCAT
+              .extern STAYON
+              .extern STBT10
+              .extern STBT30
+              .extern STBT31
+              .extern STDEV
+              .extern STFLGS
+              .extern STMSGF
+              .extern STO
+              .extern STOLCC
+              .extern STOP
+              .extern STOPS
+              .extern STOPSB
+              .extern STORFC
+              .extern STOST0
+              .extern STO_DIVIDE
+              .extern STO_MINUS
+              .extern STO_MULTIPLY
+              .extern STO_PLUS
+              .extern STSCR
+              .extern STSCR_
+              .extern SUBONE
+              .extern SUMCHK
+              .extern TAN
+              .extern TBITMA
+              .extern TBITMP
+              .extern TEN_TO_X
+              .extern TEXT
+              .extern TGSHF1
+              .extern TOGSHF
+              .extern TONE
+              .extern TONE7X
+              .extern TONSTF
+              .extern TOOCT
+              .extern TOPOL
+              .extern TOREC
+              .extern TRC10
+              .extern TRG100
+              .extern TRGSET
+              .extern TSTMAP
+              .extern TXTLB1
+              .extern TXTLBL
+              .extern TXTROM
+              .extern TXTSTR
               .extern UPLINK
               .extern VIEW
               .extern WKUP10
-              .extern XARCL, XASHF, XASN, XASTO, XAVIEW
-              .extern XBAR, XBEEP, XBST
-              .extern XCAT, XCF, XCLSIG, XCLX1, XCOPY, XCUTB1, XCUTE
-              .extern XDEG, XDELET, XDSE
-              .extern XECROM,XEQ
-              .extern XFS, XFT100, XGA00, XGI, XGI57, XGOIND, XGRAD, XGT, XGTO
-              .extern XISG, XLN1_PLUS_X, XNNROW
-              .extern XPACK, XPRMPT
-              .extern XRAD, XRDN, XRND, XROLLUP
-              .extern XROM, XROMNF, XROW1, XRS45, XRTN, XR_S
-              .extern XSCI, XSF, XSGREG, XSIGN, XSIZE, XSST, XSTYON
-              .extern XTOHRS, XTONE, XVIEW, XXEQ
-              .extern XX_EQ_0, XX_EQ_Y, XX_GT_0, XX_GT_Y, XX_LE_0A, XX_LE_Y
-              .extern XX_LT_0, XX_LT_Y, XX_NE_0, XX_NE_Y, XY_TO_X, X_BY_Y13
-              .extern X_EQ_0, X_EQ_Y, X_GT_0, X_GT_Y, X_LE_0, X_LE_Y, X_LT_0
-              .extern X_LT_Y, X_NE_0, X_NE_Y, X_TO_2, X_XCHNG, X_XCHNG_Y
+              .extern XARCL
+              .extern XASHF
+              .extern XASN
+              .extern XASTO
+              .extern XAVIEW
+              .extern XBAR
+              .extern XBEEP
+              .extern XBST
+              .extern XCAT
+              .extern XCF
+              .extern XCLSIG
+              .extern XCLX1
+              .extern XCOPY
+              .extern XCUTB1
+              .extern XCUTE
+              .extern XDEG
+              .extern XDELET
+              .extern XDSE
+              .extern XECROM
+              .extern XEQ
+              .extern XFS
+              .extern XFT100
+              .extern XGA00
+              .extern XGI
+              .extern XGI57
+              .extern XGOIND
+              .extern XGRAD
+              .extern XGT
+              .extern XGTO
+              .extern XISG
+              .extern XLN1_PLUS_X
+              .extern XNNROW
+              .extern XPACK
+              .extern XPRMPT
+              .extern XRAD
+              .extern XRDN
+              .extern XRND
+              .extern XROLLUP
+              .extern XROM
+              .extern XROMNF
+              .extern XROW1
+              .extern XRS45
+              .extern XRTN
+              .extern XR_S
+              .extern XSCI
+              .extern XSF
+              .extern XSGREG
+              .extern XSIGN
+              .extern XSIZE
+              .extern XSST
+              .extern XSTYON
+              .extern XTOHRS
+              .extern XTONE
+              .extern XVIEW
+              .extern XXEQ
+              .extern XX_EQ_0
+              .extern XX_EQ_Y
+              .extern XX_GT_0
+              .extern XX_GT_Y
+              .extern XX_LE_0A
+              .extern XX_LE_Y
+              .extern XX_LT_0
+              .extern XX_LT_Y
+              .extern XX_NE_0
+              .extern XX_NE_Y
+              .extern XY_TO_X
+              .extern X_BY_Y13
+              .extern X_EQ_0
+              .extern X_EQ_Y
+              .extern X_GT_0
+              .extern X_GT_Y
+              .extern X_LE_0
+              .extern X_LE_Y
+              .extern X_LT_0
+              .extern X_LT_Y
+              .extern X_NE_0
+              .extern X_NE_Y
+              .extern X_TO_2
+              .extern X_XCHNG
+              .extern X_XCHNG_Y
               .extern Y_TO_X
