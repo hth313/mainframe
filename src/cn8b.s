@@ -1264,7 +1264,7 @@ GSBQ0:        rcr     12            ; move address almost into place
 ; *- 700 it will not go to 256 but to 512 as the labels are for
 ; *- programming convenience only. Be careful when you use these routines.
 ; *
-; * Uses only C[6:2].
+; * Uses only C[6:2], +0 sub levels
 ; *
               .public GSB000
               .public GSB256

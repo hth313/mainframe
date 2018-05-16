@@ -1325,7 +1325,7 @@ RSTSQ:        c=regn  14
 ; * RSTMS0 - Same as RSTMS1, except calls ENCP00 first, thereby
 ; *     using an additional subroutine level
 ; *
-; * USES: C, S0-S7,            (NO PT, +0 sub levels[except RSTMS0])
+; * USES: C, S0-S7,            (NO PT, +0 sub levels [except RSTMS0])
 ; *
               .public RSTMS0
               .public DATOFF

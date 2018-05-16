@@ -316,7 +316,7 @@ ATOX10:       c=0     x
               c=0     xs
 ATOX15:       a=c     x
 ATOX20:       gosub   `BIN-D`       ; convert the binary to decimal
-ATOX30:       golong  RCL     ; recall the number to X
+ATOX30:       golong  RCL           ; recall the number to X
 
               .name   "FLSIZE"
 FLSIZE:       s0=     1
@@ -767,7 +767,7 @@ LB_32FF:      golong  ALM210
 ;;; *                            If they are one byte different, # of
 ;;; *                            bytes between then is one, etc ..)
 ;;; *            PT = 3
-;;; *   used A[3:0], B[3:0], C, S2, S3    +0 sub level
+;;; *   used A[3:0], B[3:0], C, S2, S3    +0 sub levels
 ;;; * CNTBYE - special entry point for addresses in the external
 ;;; *          memory
 ;;; *   output : A[3:0] = # of bytes
@@ -947,7 +947,7 @@ CLRGX:        goto    .+1
 ;;; *   input  : A[1:0] = the 8 bits
 ;;; *   output : A[1:0] = swapped 8 bits
 ;;; *            PT     = 1
-;;; *   used A.X, C.X, PT    +0 sub level
+;;; *   used A.X, C.X, PT    +0 sub levels
 SWPBIT:       pt=     9
               asl     x             ; A[2:1] = status byte
               acex    x             ; C[2:1] = remaining status byte
@@ -1071,7 +1071,7 @@ NXCH30:       pt=     1
 ;;; *            if S2=1 next module is not connected to current module
 ;;; *            A[7:4] = input of A[3:0]
 ;;; *            PT = 3
-;;; *   used A[7:0], C, S2, PT=3   +0 sub level
+;;; *   used A[7:0], C, S2, PT=3   +0 sub levels
               .public NXTMDL
 NXTMDL:       c=a                   ; save A[3:0] to A[7:4]
               rcr     4
@@ -1308,7 +1308,7 @@ GTFR30:       a=a+c   x             ; multiply by 1000 (or 100)
 ;;; * ENRGAD = get lowest register address of current module
 ;;; *   input  : A[3:0] = reg addr in current module
 ;;; *   output : C[3:0] = lowest reg addr of current module
-;;; *   used  C[3:0]  +0 sub level
+;;; *   used  C[3:0]  +0 sub levels
               .public ENRGAD
 ENRGAD:       ldi     64
               ?a#0    xs            ; current at base module ?
@@ -2786,7 +2786,7 @@ RESZFL:       goto    .+1
 ;;; *          table.
 ;;; *
 ;;; * in:  key down C(1:0)= table length - 1, C.XS= 0
-;;; * !!!! NOTE !!!! The last constant in the key code table must be 0 ti
+;;; * !!!! NOTE !!!! The last constant in the key code table must be 0 to
 ;;; *                mark the end of the table.
 ;;; * assume: hexmode
 ;;; * out: C.X= 0 (needed for digit keys)
@@ -2796,7 +2796,7 @@ RESZFL:       goto    .+1
 ;;; *
 ;;; * Time= 7(key poisition in table) + 12   [including GSB & RTN]
               .public `KEY-FC2`
-`KEY-FC2`:     c=0     m
+`KEY-FC2`:    c=0     m
               rcr     11            ; C(4:3)= table length
               a=c     m
               c=keys
