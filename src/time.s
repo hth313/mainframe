@@ -3852,7 +3852,7 @@ SKPAL2:       a=a+1   x             ; count the time&date register
 ;;; **********************************************************************
 
               .public SRHBFI, SRHBUF
-SRHBFI:       gosub   INITMR ; initializes timer chip if necessary
+SRHBFI:       gosub   INITMR        ; initializes timer chip if necessary
 SRHBUF:       c=0
               pfad=c
               sel q

@@ -390,7 +390,7 @@ PKIO20:       c=n
               rcr     4
               n=c                   ; put the updated length back
               gosub   CLRREG
-              ?b#0    S             ; is this buffer being used ?
+              ?b#0    s             ; is this buffer being used ?
               gsubc   PUTREG        ; yes. put reg back.
               goto    PKIO20
               .fillto 0x155         ; preserve entry table
