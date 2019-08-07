@@ -10,10 +10,10 @@ MOD_CX = 41cx.mod
 all: $(MOD_CX) $(MOD_CV)
 
 %-cv.o: %.s
-	asnut -g -l$(*F)-cv.lst $< -o$@
+	asnut -g --list-file=$(*F)-cv.lst $< -o$@
 
 %-cx.o: %.s
-	asnut -DHP41CX -g -l$(*F)-cx.lst $< -o$@
+	asnut -DHP41CX -g --list-file=$(*F)-cx.lst $< -o$@
 
 $(MOD_CX): $(OBJS_CX) 41cx.scm 41cx.moddesc
 	lnnut -g -l $(OBJS_CX) 41cx.scm 41cx.moddesc
