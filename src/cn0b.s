@@ -292,6 +292,7 @@ XCUTB1:       ldi     0x14          ; @12000\256 main FCN table
 ; *
               .public RSTKB
               .public RST05
+              .newt_timing_start
 RSTKB:        rst kb
               chk kb
               goc     RSTKB
@@ -301,6 +302,7 @@ RST10:        rst kb
               c=c-1   x
               gonc    RST10
               rtn
+              .newt_timing_end
 
               .fillto 0xa2
 ERROF:        gosub   ERROR         ; overflow treated as error
@@ -598,12 +600,13 @@ DRSY25:
 ; * update.  Entry conditions are the same as for DRSY51.
               ?s9=1                 ; keyboard reset yet?
               goc     DRSY30        ; yes
+              .newt_timing_start
               ldi     81            ; delay 25 millisec
                                     ; for debounce
 DRSY26:       c=c-1   x
               gonc    DRSY26
               gosub   RSTKB
-
+              .newt_timing_end
 
 ; * Entry point added for HP-41CX
               .public DRSY30
@@ -659,6 +662,7 @@ DRSY51:                             ; this entry used to bypass
 PAUSLP:       gosub   PGMAON        ; turn on prgm annunciator
               ldi     PauseCounter  ; initialize pausetimer
               a=c     x             ; A.X=pausetimer
+              .newt_timing_start
 ; * Pausetimer set empirically to match hp67 on a benchmark PGM
 ; * consisting of 100 pse's followed by fix 9, stop.
 ; * This timing was subsequently screwed up by extending ROMCHK's
@@ -672,6 +676,7 @@ PAUS10:       chk kb                ; is a key down?
               gosub   RMCK05
               a=a-1   x             ; has pause expired?
               gonc    PAUS10        ; no, not yet
+              .newt_timing_end
               golong  RUN           ; yep
 
 WKUP20:       c=keys
@@ -955,7 +960,7 @@ ILOOP:        acex
 ; * ROMCHK assumes SS0 is up, clears S2 (IOFLAG), and stores SS0
 ; * back to reg 14
               ldi     6             ; cold start
-              gosub   ROMCHK
+              gosub   NEWT_COLDST   ; also does ROMCHK
               ldi     0x169         ; warm start constant
               a=c     x
               c=regn  13
@@ -1437,12 +1442,14 @@ PATCH8:       gosub   ARGOUT        ; put ALPHAREG to LCD
 ; *          run portion of R/S
 ; *
               .public PACH4
+              .newt_timing_start
 PACH4:        ldi     167           ; set up 100ms wait
 PTCH4A:       rst kb                ; is the key still down?
               chk kb
               golnc   XRS45         ; no, go run!
               c=c-1   x             ; time out over?
               gonc    PTCH4A        ; no, keep checking the key
+              .newt_timing_end
               golong  LINNUM        ; display the starting step
 
 ; *

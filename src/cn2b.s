@@ -254,8 +254,10 @@ BLINK1:
 BLINK:                              ; disoff ignore a key, turn display on
               disoff
               ldi     208
+              .newt_timing_start
 1$:           c=c-1   x
               gonc    1$
+              .newt_timing_end
               distog
               rtn
 INPTDG:       dec pt                ; insert a digit to REG.9
@@ -1132,6 +1134,7 @@ BSTCNT:       b=c     x             ; save entry #
 #endif
 ; ******************************************************
 CNTLOP:       ldi     0x100         ; load time-out constant
+              .newt_timing_start
 KPCNT:        bcex
               chk kb
               gonc    DECCNT
@@ -1156,6 +1159,7 @@ RSTKBD:       rst kb
 DECCNT:       bcex
               c=c-1   x
               gonc    KPCNT
+              .newt_timing_end
               goto    GTCNTR
               .fillto 0x3b4
 SSTCAT:       gosub   SETSST        ; set SST flag

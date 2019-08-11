@@ -285,6 +285,7 @@ WAITS:        .equlab 0x741a
               .extern NEWLOC
               .extern NEWLSK
               .extern `NEWM.X`
+              .extern NEWT_COLDST
               .extern NOREGCX
               .extern NORM
               .extern NORMC

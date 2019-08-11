@@ -1,25 +1,17 @@
 SRCS_CV = cn0b.s cn1b.s cn2b.s cn3b.s cn4b.s cn5b.s cn6b.s \
        cn7b.s cn8b.s cn9b.s cn10b.s cn11b.s
-OBJS_CV = $(SRCS_CV:%.s=%-cv.o)
-MOD_CV = 41cv.mod
 
-SRCS_CX = $(SRCS_CV) extfuns.s time.s extfuns2.s
-OBJS_CX = $(SRCS_CX:%.s=%-cx.o)
-MOD_CX = 41cx.mod
+SRCS_CL = $(SRCS_CV) extfuns.s time.s extfuns2.s
+OBJS_CL = $(SRCS_CL:%.s=%-cl.o)
+MOD_CL = 41cl.mod
 
-all: $(MOD_CX) $(MOD_CV)
+all: $(MOD_CL)
 
-%-cv.o: %.s
-	asnut -g --list-file=$(*F)-cv.lst $< -o$@
+%-cl.o: %.s
+	asnut -DHP41CX --cpu=newt -g --list-file=$(*F)-cl.lst $< -o$@
 
-%-cx.o: %.s
-	asnut -DHP41CX -g --list-file=$(*F)-cx.lst $< -o$@
-
-$(MOD_CX): $(OBJS_CX) 41cx.scm 41cx.moddesc
-	lnnut -g -l $(OBJS_CX) 41cx.scm 41cx.moddesc
-
-$(MOD_CV): $(OBJS_CV) 41cv.scm 41cv.moddesc
-	lnnut -g -l $(OBJS_CV) 41cv.scm 41cv.moddesc
+$(MOD_CL): $(OBJS_CL) 41cx.scm 41cx.moddesc
+	lnnut -g -l --output-format=MOD2 $(OBJS_CL) 41cx.scm 41cx.moddesc --output-file=$@
 
 clean:
-	-rm $(OBJS_CV) $(OBJS_CX) $(MOD_CV) $(MOD_CX) 41cv 41cx *.lst
+	-rm $(OBJS_CL) $(MOD_CL)  *.lst

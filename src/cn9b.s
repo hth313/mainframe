@@ -1266,6 +1266,7 @@ IORUN:        ldi     11            ; main running loop
 ; * the partial key sequence.
 
               .public ROMCHK
+              .newt_timing_start
 ROMCHK:       a=c     x             ; save addr in A.X
               s2=     0             ; clear IOFLG
               c=regn  14
@@ -1301,3 +1302,4 @@ RMCK20:       cxisa
               ?c#0    x
               gonc    RMCK15
               gotoc
+              .newt_timing_end

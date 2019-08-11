@@ -806,6 +806,7 @@ NLT000:
               c=regn  10
               a=c                   ; save FC in A
               ldi     200
+              .newt_timing_start
               disoff
 NLT010:       rst kb
               chk kb
@@ -813,6 +814,7 @@ NLT010:       rst kb
               c=c-1   x
               gonc    NLT010
               distog
+              .newt_timing_end
 NLT020:                             ; for entry here,
                                     ; FC, arg in A[4:1]
               gosub   NULTST
@@ -858,17 +860,21 @@ NLT050:       cstex                 ; bring back SS0
 NULTST:                             ; null test
               ldi     576           ; initialize null timer
               c=c+c   x
+              .newt_timing_start
 NULT10:       rst kb
               chk kb                ; key up yet?
               golnc   RST05         ; go debounce
               c=c-1   x             ; no. decrement counter
               gonc    NULT10
+              .newt_timing_end
               s8=     0             ; don't print message
               gosub   MSGA          ; key down too long
               xdef    MSGNL
               ldi     1000
+              .newt_timing_start
 NULT20:       c=c-1   x             ; 310 millisec delay
               gonc    NULT20        ;  so "NULL" can be seen
+              .newt_timing_end
 AB10XF:       golong  ABTS10
 
               .public NAME20

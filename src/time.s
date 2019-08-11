@@ -43,12 +43,11 @@ FatStart:     .fat    HEADER
               .fat    CLRALMS
               .fat    RCLALM
               .fat    SWPT
+              .fat    YRES
 FatEnd:       .con    0, 0
 
-              .name   "-CX TIME"
-CXHEADER:
-
-              .name   "-TIME  2C"
+              .fillto 0x054
+              .name   "-TIME  3A"
 HEADER:
 
               .name   "SWPT"
@@ -64,6 +63,7 @@ RCLALM:       golong  RCLALM2
 CLRALMS:      golong  CLRALMS2
 
               .fillto 0x86
+
               .name   "DOW"
 DOW:          s1=     0             ; don't add X to "DATA ERROR"
               gosub   `X-YMDD`
@@ -101,7 +101,9 @@ DOW30:        c=m                   ; C = 0D000000000000
               .public CHKXM, CHECKX, CHECK
 CHKXM:        m=c
 CHECKX:       ldi     3             ; address of "X" register
-CHECK:        dadd=c
+CHECK:        .newt_timing_start
+              dadd=c
+              .newt_timing_end
               gosub   P6RTN         ; B= massaged register contents
               c=b
               golong  CHK_NO_S      ; error if alpha data
@@ -647,7 +649,7 @@ DSAMSG:       s3=     1             ; set "first register" flag
               pt=     13
               sel p
               c=0     x
-              pfad=c                ; disabled any peripheral
+              pfad=c                ; disable any peripheral
               c=m                   ; C.X = addr of current alarm
               a=c     x
               dadd=c
@@ -989,7 +991,9 @@ SHFTD8:       a=c     x
 
               .public FNDMSG
 FNDMSG:       ldi     8
+              .newt_timing_start
               dadd=c                ; enable reg 8
+              .newt_timing_end
               acex    x             ; A.X= 8= register address
 ;;; * Note: Could save a state by setting C.S=3 and doing 'acex' at
 ;;; *       the expense of destroying A.M
@@ -2057,8 +2061,10 @@ DIFF65:       b=a     s
 
               .public RSTKBT
 RSTKBT:       ldi     122
+              .newt_timing_start
 1$:           c=c-1   x             ; do 40 msec down debounce
               gonc    1$
+              .newt_timing_end
               golong  RSTKB
 
 
@@ -2114,7 +2120,9 @@ CALCRC:       gosub   `GETR#`       ; C.X= active reg number
               .public GETMXP, `GETM.X`
 GETMXP:       pt=     1
 `GETM.X`:     c=m                   ; C.X= reg address
+              .newt_timing_start
               dadd=c
+              .newt_timing_end
               c=data
               rtn
 
@@ -2297,7 +2305,7 @@ TMRKEY:       sethex
               c=0     x
               pfad=c                ; disable peripherals
               ldi     19
-              gosub   `KEY-FC` ; branch to functions
+              gosub   `KEY-FC`      ; branch to functions
 ;;; * execution time= 7(KEY) + 12  including GSB & RTN
               .con    0x87          ; R/S
               .con    0x13          ; ENTER
@@ -2441,8 +2449,10 @@ TMRSST:       ?s6=1                 ; entering address?
               setdec
               ?s7=1                 ; shift set?
               goc     TMSST2        ; yes, do a BST
+              .newt_timing_start
 TMSST1:       a=a-1   x             ; wait 100 word times for
               gonc    TMSST1        ;  40 msec total down debounce
+              .newt_timing_end
               golong  TENT35        ; do a SST
 TMSST2:       c=c-1   x             ; do a BST
               gonc    TMSST4
@@ -2548,6 +2558,7 @@ ADRE50:       gosub   `PUTR#`
 ;;; * slowest 41C clock
 
               .public TMRENT
+              .newt_timing_start
 TMRENT:       ?s6=1                 ; entering address?
               goc     TMRKJ1        ; yes, ignore the key
               gosub   ENTMR
@@ -2624,6 +2635,7 @@ TENT45:       ?s7=1                 ; shift set?
                                     ; A= date read back
               data=c                ; restore original reg contents
               c=m
+              .newt_timing_end
 TENT60:       a#c?                  ; does the next reg exist?
               gsubc   BEEPK         ; no, sound warning beep
               golong  TMR01
@@ -3116,10 +3128,12 @@ ACT240:       gosub   ALMSST        ; single step to next alarm
               goto    ACT242        ; (P+1) continue running catalog
               ldi     1023          ; (P+2) no more alarms
 ;;; * Wait 0.5 seconds before exiting to give user a chance to hit R/S
+              .newt_timing_start
 ACT241:       chk kb
               goc     ACT250
               c=c-1   x
               gonc    ACT241
+              .newt_timing_end
               goto    ACTEXT        ; timeout, exit catalog
 ACT242:       golong  ACT125
 
@@ -3134,8 +3148,10 @@ ACTOFF:       golnc   TMROFF        ; yes
               ?a#c    x             ; R/S key?
 A180J1:       gonc    ACT180        ; yes
               ldi     403           ; wait 0.125 sec
+              .newt_timing_start
 ACT265:       c=c-1   x
               gonc    ACT265
+              .newt_timing_end
               rst kb
               chk kb                ; key still down?
               gsubnc  RSTKB         ; no, do up debounce
@@ -3300,10 +3316,12 @@ ABST20:       c=b     x             ; C.X= addr of previous alarm
               .public WAITK6, WAITKD
 WAITKD:       distog                ; turn display on
 WAITK6:       ldi     753           ; wait 0.6 seconds
+              .newt_timing_start
 WAITK:        chk kb                ; key down?
               golc    ACT170
               c=c-1   x
               gonc    WAITK
+              .newt_timing_end
               disoff
               rtn
 
@@ -3489,7 +3507,7 @@ STA100:       n=c                   ; N= alarm & info
               ?a<c    x             ; is there a space problem now?
               gonc    STA150        ; no, still OK
               s0=     0             ; yes, no room to create buffer
-STA150:       gosub   SRHBUF     ; search for the timer buffer
+STA150:       gosub   SRHBUF        ; search for the timer buffer
                                     ; A.X= beginning of buffer
               goto    STA200        ; (P+1) buffer found
 ;;; *
@@ -4123,6 +4141,7 @@ SDHMSK:       c=0     m
               inc pt
               inc pt
               inc pt
+              .newt_timing_start
               setdec
               bcex    m
               c=0     m
@@ -4165,6 +4184,7 @@ DHMS40:       ?pt=    5             ; just finished hours?
               bcex    m             ; C.M= 0000000360, save C in B
               lc      0             ; C.M= 0000000060= 10 minutes, PT= 4
               goto    DHMS35
+              .newt_timing_end
 DHMS50:       rcr     13            ; C= DDDDDDHHMM0000
               acex    wpt           ; C= DDDDDDHHMMSSCC
               a=c
@@ -4310,7 +4330,9 @@ CLRAL0:       ldi     0x29          ; don't clear ALM A, DTZB, PUS
               rdtime                ; C= main clock time
               a=c
               c=0
+              .newt_timing_start
               dadd=c
+              .newt_timing_end
               acex
               regn=c  9             ; reg 9= main clock time
               setdec
@@ -4868,9 +4890,11 @@ BEPI:         c=st
 BEEP2:        s8=     0             ; don't check keyboard
 BEEP2K:       gosub   BEPI
               ldi     601           ; ..... first beep .....
+              .newt_timing_start
 BEP210:       fexsb                 ; (no keyboard check)
               c=c-1   x
               gonc    BEP210
+
               goto    BEPK05
 
 BEEPKP:       gosub   BEPI
@@ -4894,6 +4918,7 @@ BEPK40:       c=c-1   x
               gonc    BEPK30
 BEPK50:       clr st
               f=sb                  ; clear flag out register
+              .newt_timing_end
               c=a     x             ; C= input status bits
               st=c                  ; restore input status
               rtn
@@ -5028,7 +5053,9 @@ T12H40:       sethex
               .public `T=T+TP`
 `T=T+TP`:     a=c
               c=0
+              .newt_timing_start
               dadd=c
+              .newt_timing_end
               c=regn  9             ; C= old clock time
               bcex                  ; B = old clock time (begin of proc.)
               gosub   ENTMR         ; enable timer chip, PT=A
@@ -5242,6 +5269,15 @@ FTIME:        rdtime                ; C= current time
               sethex
               rtn
 
+              .name   "-CL TIME"
+CXHEADER:     rtn
+
+              .name   "YRES"
+YRES:         c=0
+              pt=     4
+              lc      6
+              wcmd
+              rtn
 
 ;;; **********************************************************************
 ;;; * TRUN -- "NFR" entry point                               3-10-81 RSW
@@ -5273,7 +5309,9 @@ TRUN10:       alarm?
               gonc    TRUN40        ; no, alarm came during a function
               a=c                   ; A[11]= user flags 8-11
               c=0
+              .newt_timing_start
               dadd=c
+              .newt_timing_end
               c=regn  14
               pt=     11
               acex    pt            ; restore user flags 8-11
@@ -5325,7 +5363,9 @@ LSWK10:       pt=a                  ;  (save a sub level, partial key seq)
               ?s4=1                 ; doing clock display?
               gonc    LSWK65        ; no
 LSWK15:       c=0     x             ; yes, check for evidence of a key down
+              .newt_timing_start
               dadd=c
+              .newt_timing_end
               c=regn  14
               rcr     1
               cstex
@@ -5718,9 +5758,11 @@ DSPA15:       gosub   DSTMDA        ; display time and date
               st=c                  ; restore alarm temporary status
 DSPA20:       c=0     x
               pfad=c                ; disable display
+              .newt_timing_start
               c=c-1   x
 DSPA21:       c=c-1   x
               gonc    DSPA21        ; wait 1.3 sec
+              .newt_timing_end
               gosub   RSTKB         ; clear keyboard
               c=m
               pt=     13
@@ -5734,6 +5776,7 @@ DSPA21:       c=c-1   x
 ;;; *      S9= 1 (0)  (not) beeping
 ;;; *
 
+              .newt_timing_start
 DSPA25:       disoff                ; turn off display
               m=c                   ; M.S= timeout counter
               ldi     241           ; wait 0.15 sec with dislay off
@@ -5760,6 +5803,7 @@ DSPA40:       chk kb                ; key down?
               s9=     1             ; no, beep
               goto    DSPA25        ; C.S= F from previous timeout
                                     ;  so beep&flash for 15 seconds
+              .newt_timing_end
 DSPA60:       s6=     1             ; no key down, set message flag
               ?s7=1                 ; poweroff?
               goc     ALM160        ; yes, don't stop clock mode
@@ -5790,11 +5834,13 @@ DSPA85:       gosub   RSTKBT        ; (P+2) wait for key up
               gosub   DSA2ND        ; display rest of message (if any)
               nop                   ; (P+1)
               c=0     x             ; (P+2)
+              .newt_timing_start
               c=c-1   x
 DSPA95:       chk kb                ; key down?
               goc     DSPA81        ; yes
               c=c-1   x
               gonc    DSPA95
+              .newt_timing_end
 DSPA97:       gosub   RSTKBT        ; clear keyboard
 
 ;;; * !!! This is the "key down" exit from DSPALM !!!!
@@ -5868,7 +5914,9 @@ ALM210:       gosub   ENTMR         ; enable timer chip, PT=A
 ALM215:       a=a+1   x             ; A.X= address of first alarm
               gosub   `NEWM.X`      ; C.X= M.X= address of first alarm
 
-ALM220:       dadd=c
+ALM220:       .newt_timing_start
+              dadd=c
+              .newt_timing_end
               c=data
               bcex    x             ; B.X= alarm information
               c=0     x
@@ -6085,8 +6133,8 @@ LSWKUP:       golong  LSWK00
               goto    LSWKUP        ; I/O service entry location
               goto    DSWKON        ; deep sleep startup entry location
               nop                   ; cold start entry location
-              .con    3             ; Rev C
-              .con    '2'           ; Rev 2
+              .con    1             ; Rev A
+              .con    '3'           ; Rev 3
               .con    0x200 + 13    ; bank switched + M
               .con    20            ; T
               .con    0             ; checksum position

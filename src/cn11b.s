@@ -311,6 +311,7 @@ SCROL0:       ?s8=1                 ; scroll required ?
               rtn c                 ; no
               ?s9=1                 ; has keyboard been reset ?
               goc     SCROL2        ; yes
+              .newt_timing_start
               rst kb
               chk kb
               goc     SCROL5        ; old key still down
@@ -323,6 +324,7 @@ SCROL5:       ldi     0x380
                                     ;     ***********************
 SROL10:       c=c-1   x
               gonc    SROL10
+              .newt_timing_end
               rtn
 ; *
 ; * Clear LCD
@@ -1170,9 +1172,16 @@ OUTROM:       gosub   MESSL
               .con    13            ; M
               .con    0x220         ; BLANK
               rtn
-; * Reservel 2 words at the end of CN11 for the chip 2 checksum
-; * trailer.
 
-              .fillto 0x3FE
+              .public NEWT_COLDST
+NEWT_COLDST:  pt=     4
+              lc      6             ; disable MMU
+              wcmd
+              golong  ROMCHK
+
+; * Reserve 2 words at the end of CN11 for the chip 2 checksum
+; * trailer.
+              .fillto 0x3fe
+
 REVLV2:       .con    12            ; REV level= L
 CKSUM2:       .con    0000

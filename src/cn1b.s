@@ -395,11 +395,13 @@ ROW125:       s1=     0
 ; *
 DFKBCK:       ldi     200
               s9=     1             ; assume KB will be reset
+              .newt_timing_start
 DF010:        rst kb
               chk kb
               rtn nc
               c=c-1   x
               gonc    DF010
+              .newt_timing_end
 DFRST9:       s9=     0             ; say keyboard not reset yet
 DFRST8:       s8=     0             ; say no prompt, scrolling
 DFILLF:       s1=     0             ; say lcd notl full yet

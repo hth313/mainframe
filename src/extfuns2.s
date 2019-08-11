@@ -67,6 +67,7 @@ LB_5018:      wrten
               b=a     x
               ?c#0    x
               gonc    LB_5028
+              .newt_timing_start
 LB_5020:      ldi     158
               a=a-1   x
               gonc    LB_5028
@@ -78,6 +79,7 @@ LB_5028:      chk kb
               c=c-1   x
               gonc    LB_5028
               goto    LB_5020
+              .newt_timing_end
 LB_502D:      gosub   ENLCD
               c=regn  5
               st=c
@@ -932,8 +934,10 @@ EMDIR2:       pt=     11
               chk kb
               goc     LB_540E
               c=0     x
+              .newt_timing_start
 EMDR45:       c=c+1   x
               gonc    EMDR45
+              .newt_timing_end
               chk kb
               goc     LB_540E
 EMDR50:       golBank1 EMDR10
@@ -941,8 +945,10 @@ LB_540E:      gosub   CAT_STOP
               ?a#c    x
               gonc    LB_541B
               ldi     400
+              .newt_timing_start
 LB_5414:      c=c-1   x
               gonc    LB_5414
+              .newt_timing_end
               rst kb
               chk kb
               gosub   RSTKB
@@ -955,6 +961,7 @@ LB_541B:      pt=     11
 LB_5421:      c=0
               pt=     7
               lc      2
+              .newt_timing_start
 LB_5424:      chk     kb
               goc     LB_5430
               ?lld
@@ -963,6 +970,7 @@ LB_5424:      chk     kb
               goc     LB_542C
 LB_542A:      c=c-1   m
               gonc    LB_5424
+              .newt_timing_end
 LB_542C:      golBank1 CLDSP
 LB_5430:      gosub   CAT_STOP
               ?a#c    x
@@ -1114,6 +1122,7 @@ RDT130:       gosub   NXCHR         ; point to next byte
               c=m
               c=a     wpt
               m=c
+              .newt_timing_start
 RDT135:       gosub   RDDFRM        ; read a byte from loop
               hpil=c  2             ; echo the data frame
               ?c#0    x             ; end of text ?
@@ -1122,6 +1131,7 @@ RDT135:       gosub   RDDFRM        ; read a byte from loop
               ?s9=1                 ; any error ?
               goc     RDT200        ; yes, let's quit
               hpil=c  2             ; echo the data frame
+              .newt_timing_end
               ?c#0    x             ; record length = 0 ?
               gonc    RDT135        ; yes, ignore this record
               n=c                   ; save record length in N.X
@@ -1811,10 +1821,12 @@ AROT30:       c=n
 GETKEY2:      c=0
               pt=     3             ; set counter for 10 sec. time out
               lc      4
+              .newt_timing_start
 GTKE10:       chk     kb
               goc     GTKE20
               c=c-1
               gonc    GTKE10        ; not time out yet
+              .newt_timing_end
               c=0                   ; time out, return zero to X
               goto    GTKE80
 GTKE20:       c=keys                ; read the physical key code
@@ -2013,8 +2025,10 @@ LB_5A59:      acex    x
 LB_5A65:      golBank1 NFRPR
 
 LB_5A69:      ldi     122
+              .newt_timing_start
 LB_5A6B:      c=c-1   x
               gonc    LB_5A6B
+              .newt_timing_end
               golong  RSTKB
 
               .public PSIZ10_2
@@ -2620,10 +2634,12 @@ LB_5D4D:      distog
               sel p
 LB_5D54:      s4=     0
 LB_5D55:      ldi     800
+              .newt_timing_start
 LB_5D57:      chk kb
               golc    LB_5D9A
               c=c-1   x
               gonc    LB_5D57
+              .newt_timing_end
               c=b     x
               c=c-1   x
               golc    LB_5D9E
@@ -2814,11 +2830,13 @@ LB_5E28:      gosub   CLLCDE
               gosub   TONE7X
               gosub   RSTKB
               ldi     1023
+              .newt_timing_start
 LB_5E42:      c=c-1   x
               goc     LB_5E4F
               c=0     m
               chk kb
               gonc    LB_5E42
+              .newt_timing_end
               c=keys
               rcr     3
               a=c     x
@@ -3097,6 +3115,7 @@ LB_5F95:      gosub   LB_5A69
               lc      4
               lc      6
               a=c     m
+              .newt_timing_start
 LB_5F9C:      chk kb
               goc     LB_5FA6
               c=c+1   x
@@ -3104,6 +3123,7 @@ LB_5F9C:      chk kb
               gosub   CHKLB2
               a=a-1   m
               gonc    LB_5F9C
+              .newt_timing_end
               golong  LB_5D9E
 LB_5FA6:      ldi     11
               gosub   `KEY-FC2`

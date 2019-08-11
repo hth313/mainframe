@@ -169,14 +169,14 @@ CLKEYS:       goto    .+1
               enrom2
               golong  CLKEYS2
 
-              .name   "-EXT FCN 2D"
+              .name   "-EXT FCN 3B"
 Header:
               .name   "ASROOM"
 ASROOM:       goto    .+1
               enrom2
               golong  ASROOM2
 
-              .name   "-CX EXT FCN"
+              .name   "-CL EXT FCN"
 CXHeader:
 
               .name   "PSIZE"
@@ -1903,10 +1903,12 @@ LB_3723:      a=a+1   xs
               ?c#0    pt
               golc    LB_37A4
               ldi     900
+              .newt_timing_start
 LB_373C:      chk     kb
               goc     LB_3741
               c=c-1   x
               gonc    LB_373C
+              .newt_timing_end
               goto    LB_3756
 LB_3741:      gosub   CAT_STOP
               ?a#c    x
@@ -1917,8 +1919,10 @@ LB_3741:      gosub   CAT_STOP
               regn=c  9
               golong  LB_37CF
 LB_374B:      ldi     403
+              .newt_timing_start
 LB_374D:      c=c-1   x
               gonc    LB_374D
+              .newt_timing_end
               rst kb
               chk kb
               goc     LB_3756
@@ -1992,7 +1996,8 @@ LB_3790:      gosub   CLLCDE
 LB_37A4:      c=0
               pt=     7
               lc      2
-LB_37A7:      chk     kb
+              .newt_timing_start
+LB_37A7:      chk kb
               goc     LB_37B4
               ?lld
               gonc    LB_37AD
@@ -2000,6 +2005,7 @@ LB_37A7:      chk     kb
               goc     LB_37AF
 LB_37AD:      c=c-1   m
               gonc    LB_37A7
+              .newt_timing_end
 LB_37AF:      s7=     1
               gosub   TGLSHF2
               golong  QUTCAT
@@ -2863,7 +2869,205 @@ CLOCK2:       s3=     1
               s5=     1
               golong  DRSY30
 
+              .fillto 0x0b50
+
+;;;**********************************************************************************
+;;; load to or unload from Page 4
+;;;
+;;; word after call contains 2 lsdigits of address, next word contains msdigit
+;;; uses A, B, C and pointer
+;;;
+;**********************************************************************************
+
+              .public LLIB, ULIB
+LLIB:         c=stk                 ; C = xxxxxxxPpppxxx return address
+              c=c+1   m             ; C = xxxxxxxPpp+xxx return address + 1
+              cxisa                 ; C = xxxxxxxPpp+XYZ
+              acex    x             ; A = xxxxxxxPpp+XYZ
+              asl     x             ; A = xxxxxxxPpp+YZ0
+              asl     x             ; A = xxxxxxxPpp+Z00
+              abex    xs            ; B = xxxxxxxxxxxZxx
+              c=c-1   m             ; C = xxxxxxxPpppxxx return address
+              cxisa                 ; C = xxxxxxxPpppUVW
+              bcex    xs            ; C = xxxxxxxPpppZVW
+              bcex    x             ; B = xxxxxxxxxxxZVW
+              c=c+1   m             ; C = xxxxxxxPpp+xxx return address + 1
+              c=c+1   m             ; C = xxxxxxxPp++xxx return address + 2
+              stk=c                 ; restore return pointer to stack
+              b=0     s             ; load library tagged by B.S = 0
+              goto    LIBSU
+ULIB:         c=0     s
+              c=c+1   s
+              bcex    s             ; unload library tagged by B.S = 1
+              b=0     x             ; top-of stack value for unload
+LIBSU:        ldi     0x3f0
+              dadd=c
+              pfad=c                ; select 41cl peripheral
+              c=0
+              pt=     11
+              lc      8             ; C = 00800000000000
+              lc      0             ; C = 00800000000000
+              lc      4             ; C = 00804000000000
+              lc      0             ; C = 00804000000000
+              lc      4             ; C = 00804040000000
+              pt=     4
+              lc      5             ; C = 00804040050000
+              ?b#0    s             ; load/unload case?
+              gonc    LLIB1         ; branch if load case
+              pt=     7
+              lc      3             ; C = 00804030050000 (unload case)
+              goto    LIB0
+LLIB1:        lc      8             ; C = 00804040058000 (load case)
+LIB0:         pt=     3
+              a=c                   ; A = 008040p005*000
+              b=a     pt            ; jjjj (load lib: 8ZVW, unload lib: 0000)
+              wcmd                  ; read mmu stack
+              c=regn  2             ; get the data
+              acex    wpt           ; combine address & data
+              c=a                   ; and get it in C
+              pt=     7
+              ?b#0    s             ; load/unload case?
+              goc     LIB2          ; branch if unload case
+              c=c-1   pt            ; C = 0080403005dddd (load case)
+              pt=     4             ; can't do jump here because of carry!
+              goto    LIB3
+LIB2:         c=c+1   pt            ; C = 0080404005dddd (unload case)
+              pt=     4
+LIB3:         lc      4             ; C = 008040q004dddd
+              wcmd                  ; load: 40>30; unload 30>40
+              c=a                   ; set up C for next write
+              pt=     4
+              lc      4
+              bcex    wpt           ; C = 008040p004jjjj
+              goto    CLWREX        ; write, deselt, return
+
+;;;**********************************************************************************
+;;; load C with the turbo save address
+;;;**********************************************************************************
+              .public TRBCL
+TRBCL:        pt=     7
+              lc      1             ; C = xxxxxx1xxxxxxx
+              lc      8             ; C = xxxxxx18xxxxxx
+
+;;;**********************************************************************************
+;;; load C with the upper four nibbles of the 41CL RAM address
+;;;**********************************************************************************
+              .fillto 0x0b98
+RAMCL:        pt=     11
+              lc      8             ; C = xx8xxxxxxxxxxx
+              lc      0             ; C = xx80xxxxxxxxxx
+              lc      4             ; C = xx804xxxxxxxxx
+              lc      0             ; C = xx8040xxxxxxxx
+              rtn
+
+;;;**********************************************************************************
+;;; save current turbo mode and go to 50x
+;;;**********************************************************************************
+
+              .fillto 0x0b9e
+              .public TSAV50
+TSAV50:       gosub   SELCL
+              c=regn  4             ; read turbo mode
+              gosub   TRBCL         ; C = xx804018xxtttt
+              pt=     4
+              lc      4             ; C = xx804018x4tttt
+              wcmd                  ; store turbo mode to 804018
+TRB50:        pt=     4
+              lc      0xd           ; C = xx804018xDtttt
+              wcmd                  ; go to 50x mode
+              rtn                   ; return with on-chip peripheral selected
+
+;;;**********************************************************************************
+;;; routine to save current turbo mode and go to 1x
+;;;**********************************************************************************
+              .fillto 0x0bac
+TSAV1:        gosub   SELCL
+              c=regn  4             ; read turbo mode
+              gosub   TRBCL         ; C = xx804018xxtttt
+              pt=     4
+              lc      4             ; C = xx804018x4tttt
+              wcmd                  ; store turbo mode to 0x804018
+TRB1:         pt=     4
+              lc      8             ; C = xx804018x8tttt
+              goto    CLWREX        ; write, deselect, return
+
+;;;**********************************************************************************
+;;; routine to restore saved turbo mode
+;;;**********************************************************************************
+              .fillto 0x0bb9
+              .public TRES, CLWREX
+TRES:         gosub   SELCL
+              gosub   TRBCL         ; C = xx804018xxxxxx
+              pt=     4
+              lc      5             ; C = xx80401805xxxx
+              wcmd                  ; read turbo mode from 804018
+              c=regn  2             ; C = xxxxxxxxxxtttt
+              acex    x             ; put it aside
+              ldi     0x008
+              c=a+c   x             ; and add 0x8 to form turbo command
+              rcr     10            ; align the command
+CLWREX:       wcmd                  ; write, deselect, return
+TRES2:        golong  ENCP00        ; deselect peripheral
+
+;;;**********************************************************************************
+;;; copy 128 words of code to 0x804880 (B = xxssssss05xxxx on entry)
+;;;**********************************************************************************
+              .public CPY128
+CPY128:       gosub   SELCL
+              c=0                   ; C = 00000000000000
+              gosub   RAMCL         ; C = 00804000000000
+              pt=     8
+              lc      8             ; C = 00804800000000
+              lc      8             ; C = 00804880000000
+              pt=     4
+              lc      4             ; C = 00804880040000 dst addr
+              a=c                   ; A = 00804880040000
+              selq
+              pt=     7
+              selp
+CPY_1:        pt=     3             ;           Q   P
+              c=b                   ; C = 00ssssss050000 src addr
+              wcmd                  ; read src entry
+              c=regn  2             ; C = 0000000000-src
+              a=c     wpt           ; A = 008048dd04-src ready to write dst
+              c=a                   ; C = 008048dd04-src mmu dst
+              wcmd                  ; write dst
+              pt=     6
+              abex    w
+              a=a+1   pq            ; next src addr
+              abex
+              a=a+1   pq            ; next dst addr
+              gonc    CPY_1         ; loop back if not done
+              goto    TRES2         ; return
+
+;;;**********************************************************************************
+;;; determine flash size - returns last page addr in A.X
+;;;**********************************************************************************
+              .fillto 0x0be8
+              .public CHKFL
+CHKFL:        gosub   SELCL
+              c=0                   ; C = 00000000000000
+              pt=     11            ;       P
+              lc      1             ; C = 00100000000000
+              pt=     4             ;              P
+              lc      5             ; C = 00100000050000
+              wcmd                  ; read flash at 0x100000
+              c=regn  2             ; C = 0000000000dddd
+              c=0     pt            ; C = 00000000000ddd
+              acex    x             ; A = xxxxxxxxxxxddd
+              ldi     0x201         ; C = 00000000000201
+              ?a#c    x
+              gonc    CKFL_1
+              c=c+1   pt            ; C = 00000000001201
+CKFL_1:       pt=     2             ;                P
+              lc      0xf           ; C = 0000000000sF01
+              LC      0xf           ; C = 0000000000sFF1
+              rcr     1             ; C = 10000000000sFF flash high page
+              acex    x             ; A = xxxxxxxxxxxsFF
+              goto    TRES2         ; return
+
               .fillto 0xc00
+
               .name   "XTOA"
               .public XTOA
 XTOA:         c=regn  3
@@ -3808,6 +4012,16 @@ SWPMD4:       acex                  ; assume, for example, MDY:
 SWPMD8:       c=0     s             ; C= 0 DDMMYYYY00 000
               rtn
 
+;;;**********************************************************************************
+;;; select 41CL on-chip peripherals
+;;;
+;;;**********************************************************************************
+              .public SELCL
+SELCL:        ldi     0x3f0
+              dadd=c
+              pfad=c
+              rtn
+
               .fillto 0xff4
               nop                   ; pause loop
               nop                   ; running
@@ -3816,8 +4030,8 @@ SWPMD8:       c=0     s             ; C= 0 DDMMYYYY00 000
               nop                   ; I/O
               nop                   ; deep wake up
               nop                   ; memory lost
-              .con    4             ; D
-              .con    0x32          ; 2
+              .con    2             ; B
+              .con    0x33          ; 3
               .con    6             ; F
               .con    5             ; E
               .con    0             ; checksum

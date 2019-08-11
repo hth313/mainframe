@@ -1009,6 +1009,7 @@ PCKDUR:       c=stk
               goc     TONE8
               c=c-1   s
               goc     TONE7
+              .newt_timing_start
 DELOOP:       a=c     s             ; get freq cntr
               fexsb                 ; turn on tone
 1$:           a=a-1   s             ; freq count
@@ -1031,6 +1032,7 @@ TONE7:        fexsb
               nop
               a=a-1   x
               gonc    TONE7
+              .newt_timing_end
               rtn
 ; *****************************************************
 ; * This routine sets degrees, radians or grads.
