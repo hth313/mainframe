@@ -150,7 +150,8 @@ PARS30:       rabcl
               a=a+1   s             ; check for backarrow
               rtn c
               a=a-1   s
-              c=stk
+              .public RETP2         ; return to P+2
+RETP2:        c=stk
               c=c+1   m             ; increment return address
               gotoc                 ; on exit, PT=1, LCD chip on,
                                     ; SS PTEMP1 up, B.X=blank

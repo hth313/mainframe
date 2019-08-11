@@ -348,6 +348,7 @@ xdef          .macro X
               .extern RCSCR
               .extern RCSCR_
               .extern RDN
+              .extern RETP2
               .extern RFDS55
               .extern RG9LCD
               .extern RMAD25

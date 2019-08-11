@@ -90,17 +90,17 @@ RMAD15:       c=c+1   pt            ; addr _ addr + hex 1000
               rtn                   ; ROM not plugged in
 #endif
 RMAD20:       c=c+1   m             ; point to 2nd word of ROM
-              c=b     x             ; load the FC #
-              a=c
+              abex    x             ; A.X = FC #, preserve ID in B.X
               cxisa                 ; load # of FC's in the ROM
 #if ! defined(HP41CX)
               nop                   ;  (deleted bug) 12/8/91 WCW
 #endif
               ?a<c    x             ; is the FC in the ROM ?
               gonc    RMAD30        ; no, FC # too big
+              b=a     x             ; restore B.X = FC #
 ; * Entry point added for HP-41CX
               .public RMAD25
-RMAD25:       acex    x             ; C.X _ FC #
+RMAD25:       acex                  ; C.X _ FC #, A.M ROM pointer
               c=c+c   x             ; multiply FC # by 2
               a=a+1   m             ; point to beginning of FC table
               c=0     m
@@ -120,12 +120,10 @@ RMAD25:       acex    x             ; C.X _ FC #
               a=c     wpt           ; A[3:0] _ XADR
               rcr     3
               a=a+c   m             ; compute chip address
-              c=stk
-              c=c+1   m             ; point to P+2
-              gotoc                 ; return to P+2
+              golong  RETP2         ; return to P+2
 
-RMAD30:       c=c-1   M
-              legal
+RMAD30:       c=c-1   m
+              abex    x             ; A.X = ID, B.X = FC #
               goto    RMAD15
 ; *
 ; *
