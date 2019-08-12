@@ -1170,9 +1170,9 @@ OUTROM:       gosub   MESSL
               .con    13            ; M
               .con    0x220         ; BLANK
               rtn
-; * Reservel 2 words at the end of CN11 for the chip 2 checksum
+; * Reserve 2 words at the end of CN11 for the chip 2 checksum
 ; * trailer.
 
-              .fillto 0x3FE
-REVLV2:       .con    12            ; REV level= L
+              .fillto 0x3fe
+REVLV2:       .con    7             ; REV level= G
 CKSUM2:       .con    0000

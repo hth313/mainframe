@@ -1240,5 +1240,5 @@ DONSGN:       golong  NFRX
 ; * trailer
 
               .fillto 0x3fe
-REVLEV:       .con    14            ; REV level= N
+REVLEV:       .con    9             ; REV level= I
 CKSUM0:       .con    0000
