@@ -1183,5 +1183,5 @@ NEWT_COLDST:  pt=     4
 ; * trailer.
               .fillto 0x3fe
 
-REVLV2:       .con    12            ; REV level= L
+REVLV2:       .con    7             ; REV level= G
 CKSUM2:       .con    0000
