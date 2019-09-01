@@ -1116,9 +1116,9 @@ NAME4D:
               rcr     11            ; put XADR to C.M
               m=c                   ; put XADR to M[6:3]
               ?s3=1                 ; program mode?
-              gonc    NAME4F        ; no
+              gonc    NAME4E        ; no
               cxisa
-              ?c#0    X             ; programmable?
+              ?c#0    x             ; programmable?
               gonc    NAME4E        ; no
               lc      3             ; set XROM bit(5)
                                     ; & insert bit(4)
