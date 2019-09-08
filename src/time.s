@@ -3986,7 +3986,7 @@ ACKAL10:      gosub   PUGALM        ; (P+2) purge this alarm
               rtn nc                ; no, done
 
               .public `RTNP+2`
-`RTNP+2`:      sethex                ; need hexmode for "c=stk"
+`RTNP+2`:     sethex                ; need hexmode for "c=stk"
               c=stk                 ; return to P+2
               c=c+1   m
               gotoc

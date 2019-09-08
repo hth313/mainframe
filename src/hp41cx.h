@@ -77,6 +77,7 @@ WAITS:        .equlab 0x741a
               .extern BEPI
               .extern `BIN-D3`
               .extern `BIN-D`
+              .extern BSTEP_EM
               .extern BYTLFT
               .extern `C-YMDD`
               .extern `C=T+D0`
@@ -88,6 +89,7 @@ WAITS:        .equlab 0x741a
               .extern CAT2CX_20
               .extern CAT2_
               .extern CAT_END3
+              .extern CAT_END3_2
               .extern CAT_STOP
               .extern CHECK
               .extern CHECKX
@@ -272,7 +274,6 @@ WAITS:        .equlab 0x741a
               .extern LB_38D6
               .extern LB_38F4
               .extern LB_3B10
-              .extern LB_3B14
               .extern LB_556C
               .extern LB_563F
               .extern LB_5A4F
@@ -293,7 +294,7 @@ WAITS:        .equlab 0x741a
               .extern NOROOM
               .extern NO_ROOM
               .extern `NWREC#`
-              .extern NXCH30
+//              .extern NXCH30
               .extern NXCHR
               .extern NXREG
               .extern NXTALM

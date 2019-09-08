@@ -1,6 +1,25 @@
 ;;; Extended functions for HP-41CX
 
 #include "hp41cx.h"
+#include "extendedMemory.h"
+
+
+;;; Code sequence to find the lowest address of the module address
+;;; in A.
+;;; This is a macro to expand inline to save sub-routine levels
+;;; in NXTMDL, but we can often use the ENRGAD subroutine which expands
+;;; this sequence.
+lowestAddress: .macro
+              ldi     64
+              ?a#0    xs            ; currently at base module ?
+              gonc    10$           ; yes
+              ldi     0x200
+              c=c+c   x             ; c.x = 400
+              ?a<c    xs            ; module 2 or 3?
+              gonc    10$           ; no, lowest address is -00
+              c=c+1   x             ; yes, lowest address is -01
+10$:          c=a     xs
+              .endm
 
 CHKCST:       .equlab 0x7cdd
 
@@ -101,8 +120,8 @@ FatEnd:       .con    0, 0
   time, the base module will be linked to address 2EF first (the
   module in port 1 or 3).
   The lowest register in every module (040 for base module, 201/301
-  for the others) is used for the linkage between modules. It contains
-  the following information:
+  for the others, and then 400, 500 etc) is used for the linkage
+  between modules. It contains the following information:
 
    13 12 11 10  9  8  7  6  5  4  3  2  1  0
   -------------------------------------------
@@ -114,8 +133,11 @@ FatEnd:       .con    0, 0
       0BF for base module
       2EF for ex.mem module in port 1 or 3
       3EF for ex.mem module in port 2 or 4
-  B - next module id = 2EF or 3EF (= 000 if no module connected)
-  C - previous module id = 040 or 2EF or 3EF
+      4FF for ex.mem in fixed memory page 4
+      ...
+      FFF for ex.mem in fixed memory page F
+  B - next module id = 2EF, 3EF, 4FF, ... (= 000 if no module connected)
+  C - previous module id = 040 or 2EF or 3EF or 4FF ...
   D - in base module this is current file number
       don't care in ex.mem module
 
@@ -169,7 +191,7 @@ CLKEYS:       goto    .+1
               enrom2
               golong  CLKEYS2
 
-              .name   "-EXT FCN 3B"
+              .name   "-EXT FCN 4A"
 Header:
               .name   "ASROOM"
 ASROOM:       goto    .+1
@@ -778,24 +800,27 @@ LB_32FF:      golong  ALM210
 CNTBYE:       c=b     x
               ?a#c    xs            ; two addresses in the same module?
               gonc    CNTBY7        ; yes
-              gosub   NXTMDL        ; advance to next module
-              ?s2=1                 ; memory discontinuity ?
-              rtn c                 ; yes, error exit
-              c=b     x             ; get end addr again
+              a=0     m             ; A[12:10]= 0
+                                    ; we use this for counting registers in
+                                    ;  modules completely crossed
+CTBE10:       gosub   NXTMDL        ; advance to next module
+              c=b     xs
               ?a#c    xs            ; are we in end module yet ?
               gonc    CTBE30        ; yes
-              ldi     238           ; add one module to start addr
-              goto    CTBE40
-CTBE30:       c=0     x
-CTBE40:       b=a     xs            ; force to the same module
+              gosub   pageSize      ; get registers in completely crossed module
+              goto    CTBE10
+
+CTBE30:       b=a     xs            ; force to the same module
               a=a-b   x             ; A.X = # of regs in next module
-              a=a+c   x             ; add 238 if crossed 3 modules
+              acex    m             ; C[12:10]= # registers in modules crossed
+              rcr     10            ; C.X = # registers in modules crossed
+              a=a+c   x             ; add # regisster in modules crossed
               b=a     x             ; B.X= # of regs over stating module
               acex
               a=c
               rcr     4             ; C[3:0]=starting addr
               a=c     wpt
-              gosub   ENRGAD        ; get end reg addr of this module
+              gosub   ENRGAD0       ; get end reg addr of this module
               a=a+b   x             ; add next module regs to start addr
               bcex    x             ; move end addr to module end reg
 CNTBY7:       pt=     3
@@ -822,6 +847,7 @@ CBYT20:       a=a-b   x
               a=a+b   wpt
               rtn
 
+              .fillto 0x332
               .public CLRALMS2
 CLRALMS2:     gosub   SRHBUF        ; locate alarm buffer
               goto    1$
@@ -998,7 +1024,7 @@ LB_33EE:      s3=     1
               rtn
 
               .public LB_33F5
-LB_33F5:      ldi     0x40
+LB_33F5:      ldi     0x40          ; make last file become working file
               dadd=c
               c=data
               rcr     6
@@ -1013,65 +1039,72 @@ LB_33F5:      ldi     0x40
 ;;; * NXCHR - routine to point to the next byte in the ex.mem
 ;;; *   input  : A[3:0] = current address
 ;;; *            PT = 3
-;;; *            IF S3=1, when it moves to the next module, it will
-;;; *                     update the base reg in both modules
-;;; *               S3=0, will not update the base registers
 ;;; *
 ;;; * NXREG - special entry point to point to next reg
 ;;; *   output : A[3:0]= next addr
 ;;; *            PT = 3
 ;;; *   used  A[7:0], C, S2,   +1 sub level
 ;;; *
-              .public NXCHR, NXREG, NXCH30
+              .public NXCHR, NXREG
 NXCHR:        gosub   INCADA        ; point to next byte
               goto    NXCH10
 NXREG:        a=a-1   x             ; point to next reg
-NXCH10:       ldi     64
-              ?a#0    xs            ; in base module ?
-              gonc    NXCH20        ; yes
-              ldi     1
-              c=a     xs
-NXCH20:       ?a#c    x             ; pointing at last reg of the module ?
+NXCH10:       gosub   ENRGAD0
+              ?a#c    x             ; pointing at last reg of the module ?
               rtn c                 ; no
-              gosub   NXTMDL        ; point to next module
-              ?s3=1                 ; want to update base reg ?
-              rtn nc                ; no
-NXCH30:       pt=     1
+              goto    NXTMDL
 
-;;; * At this point, A.X=C.X=NEF where N=2 or 3
+;;; **********************************************************************
+;;; *
+;;; * BSTEP_EM - step to previous address in extended memory
+;;; *
+;;; * Subroutine lifted from MKRM compared to original Extended Functions
+;;; *
+;;; * Needs to preserve PT due to callers assuming it does.
+;;; * used: C, A.X, DADD, +0 sub levels
+;;; *
+;;; **********************************************************************
 
-              c=0     wpt           ; change C.X= N01 to point to the lower
-              c=c+1   wpt           ;   register in this module
-              dadd=c
-              c=0                   ; fix up next module base reg
-              pt=     6
-              acex    wpt
-              a=c     wpt
-              rcr     12
-              pt=     5
-              c=0     wpt
-              acex    x
-              a=c     x
-              data=c
-              rcr     6             ; update current base reg
+              .public BSTEP_EM
+BSTEP_EM:     c=0     s             ; assume bottom reg is x00
+              ldi     0x3ff
+              c=c+1   xs            ; 0x4ff
+              ?a<c    xs            ; in module 2 or 3?
+              gonc    MKRM10        ; no
+              ldi     0xef          ; yes, module 2 or 3
+              c=c+1   s             ; bottom reg is x01
+MKRM10:       c=a     xs
+              ?a#c    x             ; have we reached top of module ?
+              goc     MKRM40        ; not yet
+              c=0     x
+              rcr     -1
+              acex    xs            ; C.X = 201/301/400/500..
               dadd=c
               c=data
-              rcr     3             ; load next module addr
-              acex    x
+              rcr     6             ; C.X = previous module addr
               a=c     x
-              rcr     11
-              data=c
-              goto    NXMDRT
+              ?a#0    xs            ; previous module the base module ?
+              gonc    MKRM40        ; yes, the preceeding reg is reg 0x41
+              ldi     0x200         ; C.XS = 4
+              c=c+c   xs
+              ?a<c    xs            ; in module 2 or 3?
+              gonc    MKRM35        ; no, module 4 or up
+              c=c+1   x             ; yes, bump last register in module up one step
+MKRM35:       acex    xs
+              a=c     x             ; A.X= 201/301/400/500/...
+MKRM40:       a=a+1   x             ; A.X= preceeding reg, will be
+              rtn                   ;    041/202/302/401/501/...
+                                    ;    if moving to previous module
 
+              .fillto 0x429
 ;;; **********************************************************************
 ;;; * NXTMDL - get next module address
 ;;; *   input  : A.X = reg addr within current module
 ;;; *   output : A.X = highest register address of next module
 ;;; *            if A.X = 0  there is no next module
-;;; *            if S2=1 next module is not connected to current module
 ;;; *            A[7:4] = input of A[3:0]
 ;;; *            PT = 3
-;;; *   used A[7:0], C, S2, PT=3   +0 sub levels
+;;; *   used A[7:0], C, PT=3   +0 sub levels
               .public NXTMDL
 NXTMDL:       c=a                   ; save A[3:0] to A[7:4]
               rcr     4
@@ -1079,82 +1112,55 @@ NXTMDL:       c=a                   ; save A[3:0] to A[7:4]
               acex    wpt
               rcr     10
               a=c
-              ldi     64
-              ?a#0    xs            ; currently in base module ?
-              gonc    NXMD01        ; yes
-              ldi     1
-              c=a     xs
-NXMD01:       dadd=c
+              lowestAddress
+              dadd=c
               ldi     0x2ef
               a=c     x
               c=data                ; get lowest reg of the module
               rcr     3             ; C.X = next module addr
+              pt=     1
               ?a#c    x             ; next module addr = 2EF ?
               gonc    NXMD05        ; yes
               a=a+1   xs            ; A.X = hex 3EF
               ?a#c    x             ; next module addr = 3EF ?
+              gonc    NXMD05        ; yes
+              a=a+1   pt            ; check if it ends with FF
+              ?a#c    wpt
               goc     NXMD10        ; no, no next module connected
-NXMD05:       pt=     1
-
-;;; * At this point, A.X=C.X=NEF where N=2 or 3.
-
-              c=0     wpt           ; load C.X = N01
-              c=c+1   wpt
-              dadd=c
-              c=data                ; get lowest reg of next module
-              ?a#c    x             ; is next module initialized ?
-              gonc    NXMDRT        ; yes, A.X=highest reg addr of next module
-
-;;; * NXMDRT set pt=3 and returns
-
-NXMD10:       s2=     1             ; discontinue memory flag
-              c=a
-              rcr     4             ; C.X=current reg addr
-              a=c     xs            ; A.X = 0EF/2EF/3EF
-              ldi     0x201
-              ?a#0    xs            ; currently in base module ?
-              goc     NXMD30        ; no
-              a=c     x             ; A.X=hex 201
-              dadd=c
-              data=c                ;  write to next module
-              c=data
-              ?a#c    x             ; reg 2-1 exist ?
-              gonc    NEWMDL        ; yes, plug it back in
-              acex    x             ; hex 201 back to C
-NXMD20:       c=c+1   xs            ; C.X = hex 301
-NXMD25:       a=c     x             ; A.X = hex 301
-              dadd=c
-              data=c
-              c=data
-              ?a#c    x             ; reg 301 exist ?
-              gonc    NEWMDL        ; yes
-NONXMD:       a=0     x             ; no next module
+              acex    x             ; yes, module 4 or up, highest address X00
+              a=0     wpt
               goto    NXMDRT
 
-NEWMDL:       pt=     1
+;;; * At this point, A.X=C.X=NEF where N=2 or 3.
+NXMD05:       a=0     wpt
+              a=a+1   wpt
+              goto    NXMDRT
+NXMD10:       a=0     x             ; no next module
 
-;;; * Both jumps to NEWMDL are done with A.X=C.X=N01 where N=2 or 3,
-;;; * so changes the 01 to EF as required, and C.XS already
-;;; * contains the correct value for the A=C X, (see above for falling in)
-
-              lc      14
-              lc      15
-              a=c     x             ; A.X = 2EF/3EF
+;;; * NXMDRT set pt=3 and return
 NXMDRT:       pt=     3
               rtn
-NXMD30:       ?a#c    xs            ; currently at reg 201 ?
-              goc     NXMD40        ; no, check reg 201
-              c=c+1   xs            ; currently at reg 201, check 301
-NXMD40:       dadd=c                ; check next module
-              c=data
-              rcr     3
-              ?a#c    x             ; is it pointing at current one ?
-              gonc    NONXMD        ; yes, no next module
-              ldi     0x201
-              ?a#c    xs            ; currently at reg 201 ?
-              goc     NXMD25        ; no, see if reg 201 exist
-              goto    NXMD20        ; yes, see if reg 301 exist
 
+;;; **********************************************************************
+;;; * pageSize - get number of registers in a module
+;;; *   input  : A.X = highest register address within module
+;;; *          : A[12:10] = assumed to be a module counter
+;;; *   output : C[12:10] = number of registers in a module
+;;; *          : A[12:10] = updated with this module
+;;; *            PT = 4
+;;; *   used C, PT=4   +0 sub levels
+pageSize:     c=0
+              pt=     0
+              ldi     238
+              ?a#0    pt
+              rtn     c
+              ldi     255
+10$:          pt=     4
+              rcr     -10           ; C[12:10]= # registers in this module
+              a=a+c                 ; A[12:10]= updated registers in modules between
+              rtn
+
+              .fillto 0x476
 ;;; **********************************************************************
 ;;; * ADVREC - advance addr to point to next record
 ;;; *   input  : A[3:0] = addr of current record length
@@ -1202,7 +1208,7 @@ ADVAD1:       c=0
               c=c+1
               pt=     3
               bcex    wpt
-ADVADR:       gosub   ENRGAD        ; get lowest reg addr of current module
+ADVADR:       gosub   ENRGAD0       ; get lowest reg addr of current module
               c=a-c   x             ; C.X=# of remaining regs in this module
               abex    x             ; A=# of regs, B = current reg addr
               ?a<c    x             ; enough room in current module ?
@@ -1309,13 +1315,12 @@ GTFR30:       a=a+c   x             ; multiply by 1000 (or 100)
 ;;; *   input  : A[3:0] = reg addr in current module
 ;;; *   output : C[3:0] = lowest reg addr of current module
 ;;; *   used  C[3:0]  +0 sub levels
+;;; *
+;;; * This routine moved as it no longer fit here.
               .public ENRGAD
-ENRGAD:       ldi     64
-              ?a#0    xs            ; current at base module ?
-              rtn nc                ; yes
-              ldi     1
-              c=a     xs
-              rtn
+ENRGAD:       golong  ENRGAD0
+
+              .fillto 0x4ea
 
 ;;; **********************************************************************
 ;;; * GTPRNA - get the program from alpha registers
@@ -2709,7 +2714,7 @@ MKRM30:       a=a+1   pt
               pt=     3
               ?a#c    pt            ; move over the edge of the reg ?
               goc     MKRM50        ; no
-              gosub   LB_3B14
+              gosub   BSTEP_EM
               a=0     pt
 MKRM50:       acex                  ; addresses into C
               ?s0=1                 ; done with both addr ?
@@ -2823,26 +2828,7 @@ KYFC30:       c=a+c   m
 LB_3B10:      gosub   OFSHFT10      ; Patch for HP-41CX, turn off shift before
               golong  NAM44_        ; going to NAM44_
 
-;;; Subroutine lifted from MKRM compared to original Extended Functions
-              .public LB_3B14
-LB_3B14:      ldi     0xef
-              c=a     xs
-              ?a#c    x             ; have we reached top of module ?
-              goc     MKRM40        ; not yes
-              ldi     1
-              acex    xs            ; C.X= 201/301
-              dadd=c
-              c=data
-              rcr     6             ; C.X= previous module addr
-              a=c     x
-              ?a#0    xs            ; previous module the base module ?
-              gonc    MKRM40        ; yes, the preceeding reg is reg 0x41
-              a=0     x
-              acex    xs            ; A.X = 200/300
-              a=a+1   x             ; A.X = 201/301
-MKRM40:       a=a+1   x
-              rtn
-
+              .fillto 0xb28
               .name   "GETKEYX"
               .public GETKEYX
 GETKEYX:      goto    .+1
@@ -3296,23 +3282,24 @@ EFLS75:       ?s3=1                 ; for read ?
               ?s5=1                 ; for directory ?
               gonc    FLNOFN        ; no file not found
               s5=     0
-EFLS76:       gosub   ENRGAD        ; get last reg addr in this module
+EFLS76:       gosub   ENRGAD0       ; get last reg addr in this module
               a=a-c   x             ; A.X= available regs in this module
               a=a-1   x             ; reserve one reg for end of mem mark
-              b=a     x             ; B <- registers left in present module
+EFLS80:       b=a     x             ; B <- registers left in present module
               acex    x
-EFLS80:       gosub   NXTMDL        ; look for next module
+              gosub   NXTMDL        ; look for next module
               ?a#0    x             ; is there a next module ?
               gonc    EFLS90        ; no
-              ldi     238           ; add 238 to B.X
-              acex    x
+
+              ldi     238           ; assumed page size
+              pt=     0
+              ?a#0    pt            ; is it page 2 or 3? (check if xx1)
+              goc     EFLS81        ; yes, size is 238
+              ldi     255           ; no, size is 255
+EFLS81:       acex    x             ; add contributed size to B.X
               a=a+b   x
-              b=a     x
-              a=c     x
-              pt=     6
-              ?a#0    pt            ; are we coming from 201 or 301 ?
-              goc     EFLS90        ; yes, don't look for another module
               goto    EFLS80
+
 EFLS85:       s0=     1             ; file found, this is needed in the case we
                                     ;  are looking for current file, we found it
               ?s3=1                 ; for write ?
@@ -3350,15 +3337,17 @@ EFLS90:       pt=     3
               data=c
 
 ;;; If the new file is starting at BF, it will write
-;;; 000010000000BF to reg.40
+;;; 000010002EF0BF to reg.40, then we proceed to initialize
+;;; all modules assuming that we are running on a system
+;;; that provides all extended memory built-in.
 EFLS92:       ?s1=1                 ; base reg initialized ?
               rtn nc                ; yes
-              c=0                   ; write 000010000000BF to reg.40
+              acex                  ; C[10:8] = first available register addr
+              rcr     8             ; C.X = first available register addr
+              bcex    x             ; B.X = first available register addr
+              c=0                   ; build 000010002EF0BF
               c=c+1
-              rcr     5
-              ldi     0xbf
-              data=c
-              rtn
+              golong  initModules0
 
               .public DELCHR, DELREC, DLRC30, DLRC50
               .name   "DELCHR"
@@ -3462,12 +3451,8 @@ DELB15:       cnex                  ; chrs left to N; next byte to C
 DELB30:       a=a-1   pt
               gonc    DELB60        ; still in the same reg
               a=a-1   x
-              ldi     0x40
-              ?a#0    xs            ; are we in the base module ?
-              gonc    DELB40        ; yes
-              ldi     1
-              c=a     xs
-DELB40:       ?a#c    x             ; about to turn over to next module ?
+              gosub   ENRGAD0
+              ?a#c    x             ; about to turn over to next module ?
               goc     DELB50        ; not yet
               dadd=c
               c=data
@@ -3484,6 +3469,14 @@ DELB60:       a=a-1   pt
               s0=     1             ; flag for second adjustment
               goto    DELB30
 
+;;; Relay code, to keep offsets as initModules is a bit too large
+;;; to fit in its current location.
+initModules0: rcr     -6
+              ldi     0x2ef
+              rcr     -3
+              golong  initModules
+
+              .fillto 0xddf
               .public PURFL
               .name   "PURFL"
 PURFL:        clrabc                ; guarantee will not say "NO ROOM" and
@@ -3561,12 +3554,8 @@ PAKEXM:       acex    x             ; C.X = next pull up addr
               rtn nc                ; if so, all done
               s0=     0
 PKRG20:       a=a-1   x
-              ldi     0x40
-              ?a#0    xs            ; are we in base module
-              gonc    PKRG30        ; yes
-              ldi     1
-              c=a     xs
-PKRG30:       ?a#c    x      ; reached last reg in the module ?
+              gosub   ENRGAD0
+              ?a#c    x             ; reached last reg in the module ?
               goc     PKRG40        ; no
               gosub   NXTMDL        ; go over to next module
 PKRG40:       abex    x
@@ -3575,6 +3564,11 @@ PKRG40:       abex    x
               s0=     1
               goto    PKRG20        ; update storing addr
 
+              .public CAT_END3
+CAT_END3:     enrom2
+              golong  CAT_END3_2
+
+              .fillto 0xe29
               .public SAVERX, GETRX
               .name   "SAVERX"
 SAVERX:       s7=     1
@@ -3919,59 +3913,86 @@ APERMG:       gosub   ERRSUB
               gosub   CLLCDE
               golong  MESSL
 
+;;; **********************************************************************
+;;; * initModules - initialize all extended memory modules
+;;; *
+;;; * Called from EFLSCH
+;;; *   input:     B.X = first available register addr
+;;; *   output:
+;;; *              A[10:8] = first available register addr
+;;; *              B.X = # of register still available
+;;; *              PT = 3
+;;; * uses  A, B[2:0], C, PT
 
-              .public CAT_END3
-CAT_END3:     gosub   ENCP00
-              s8=     0
-              gosub   IAUALL        ; printer rom
-              goto    LB_3F9C
-              c=0
-              pt=     6
-              lc      6
-              lc      15
-              lc      15
-              lc      12
-              cxisa
-              pt=     0
-              c=c-1   pt
-              c=c-1   pt
-              gosub   UNL           ; send unlisten
-              goto    LB_3FC8
-LB_3F9C:      gosub   GETPCA
-              gosub   INCAD
-              b=a     wpt
-              gosub   INCAD
-              gosub   NXBYTA
-              st=c
-              pt=     1
-              c=c+1   pt
-              goc     LB_3FC8
-              pt=     3
-              acex    wpt
-              m=c
-              ?s5=1
-              goc     LB_3FC8
-              abex    wpt
-              gosub   CPGMHD
-              c=m
-              bcex    wpt
-              gosub   CNTBY7
-              ldi     16
+initModules:  ldi     0xbf
+              data=c                ; write to link reg.0x40
+
+              ldi     0x201         ; select link register 0x201
               dadd=c
-              a=0     s
-              gosub   GENNUM
-              gosub   ENLCD
-              abex    s
-              b=a     s
+;;; build 000000403EF2EF
+              c=0
+              pt=     7
+              lc      4
+              lc      0
+              lc      3
+              lc      0xe
+              lc      0xf
+              ldi     0x2ef
+              data=c                ; write to link reg.0x201
+
+              ldi     0x301         ; select link register 0x301
+              dadd=c
+;;; build 000002EF4FF3EF
+              pt=     8
+              lc      2
+              lc      0xe
+              lc      0xf
+              lc      4
+              lc      0xf
+              lc      0xf
+              ldi     0x3ef
+              data=c
+
+;;; Now we can do full registers in a loop.
+;;; first we want 000003EF5FF4FF
+              a=c                   ; A= link register value
+              c=0
+              pt=     8             ; build 0x100100110
+              lc      1
+              pt=     5
+              lc      1
+              ldi     0x110
+              pt=     13            ; load loop counter
+              lc      HighestXMemPage - 4
+              acex
+
+10$:          pt=     1
+              c=a+c                 ; make next link register value
+              c=0     s             ; prevent pollution from counter
+              a=c     wpt           ; a[1:0]= preserved lower 2 nibbles
+              c=0     wpt           ; c.x= lowest register in page
+              dadd=c                ; select it
+              acex    wpt           ; restore C, make A[2:0]=0x100
+              data=c
+              pt=     7             ; now set C[7]= 0xf for correct previous module ID
+              lc      0xf
               a=a-1   s
-LB_3FC0:      rabcr
-              a=a-1   s
-              gonc    LB_3FC0
-              abex    s
-              acex    m
-              rcr     13
-              gosub   GENN55
-LB_3FC8:      golong  END3
+              gonc    10$
+
+              rcr     3             ; last forward link should have be 000
+              c=0     x
+              rcr     -3
+              data=c
+
+              pt=     2             ; fulfill up exit promise
+              lc      .nib2 XMEM_REGISTERS
+              lc      .nib1 XMEM_REGISTERS
+              lc      .nib0 XMEM_REGISTERS
+              bcex                  ; B.X = # registers available
+              rcr     -8            ; C[10:8] = first available register addr
+              a=c                   ; A[10:8] = first available register addr
+              pt=     3
+              rtn
 
 ;;; **********************************************************************
 ;;; * GFLG31 = get flag 31                                    12-18-80 RSW
@@ -3987,6 +4008,7 @@ LB_3FC8:      golong  END3
 ;;; **********************************************************************
 
               .public GFLG31_2
+              .fillto 0xfca
 GFLG31_2:     c=0     x
               pfad=c
               dadd=c
@@ -4017,9 +4039,13 @@ SWPMD8:       c=0     s             ; C= 0 DDMMYYYY00 000
 ;;;
 ;;;**********************************************************************************
               .public SELCL
+              .fillto 0xfe2
 SELCL:        ldi     0x3f0
               dadd=c
               pfad=c
+              rtn
+
+ENRGAD0:      lowestAddress
               rtn
 
               .fillto 0xff4
@@ -4030,8 +4056,8 @@ SELCL:        ldi     0x3f0
               nop                   ; I/O
               nop                   ; deep wake up
               nop                   ; memory lost
-              .con    2             ; B
-              .con    0x33          ; 3
+              .con    1             ; A
+              .con    0x34          ; 4
               .con    6             ; F
               .con    5             ; E
               .con    0             ; checksum

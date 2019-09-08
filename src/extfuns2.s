@@ -24,6 +24,7 @@
 ;;; ***************************************************************************
 
 #include "hp41cx.h"
+#include "extendedMemory.h"
 
 ;;; Switch to bank 1 and go to destination.
 golBank1H:    .macro  dest
@@ -795,17 +796,14 @@ LB_5304:      gosub   `X<999`
               s2=     0
               ldi     64
               a=c     x
-              gosub   NXTMDL
-              ?s2=1
-              gsubc   NXCH30
+10$:          gosub   NXTMDL
               c=b     x
               ?a#c    xs
               gonc    LB_5346
               pt=     1
               a=0     wpt
               a=a+1   wpt
-              gosub   NXTMDL
-              gosub   NXCH30
+              goto    10$
 LB_5346:      abex    x
               c=n
               bcex    x
@@ -821,7 +819,7 @@ LB_5349:      c=b     x
               ?a#c    x
               goc     LB_5361
               abex    x
-LB_5355:      gosub   LB_3B14
+LB_5355:      gosub   BSTEP_EM
               acex    x
               a=c     x
               dadd=c
@@ -832,7 +830,7 @@ LB_5355:      gosub   LB_3B14
               goc     LB_5355
               golong  TOBNK1
 LB_5361:      s0=     0
-LB_5362:      gosub   LB_3B14
+LB_5362:      gosub   BSTEP_EM
               ?s0=1
               goc     LB_5349
               abex    x
@@ -879,14 +877,9 @@ LB_5391:      gosub   APERMG
               .messl  "FL SIZE"
               golong  DISERR
 LB_539C:      gosub   NXTMDL
-              ?s2=1
-              goc     LB_5391
               c=m
               ?a#c    xs
-              gonc    LB_53A7
-              gosub   NXTMDL
-              ?s2=1
-              goc     LB_5391
+              goc     LB_539C
 LB_53A7:      c=m
               bcex    x
               rcr     3
@@ -1228,7 +1221,7 @@ WRT135:       gosub   SEKSUB        ; seek to the beginning of the file
               rcr     10
               a=c     x             ; A.X= file header addr
               a=0     pt            ; A[3:0]= last byte addr in source file
-WRT200:       gosub   NXCHR     ; point to next byte in storage
+WRT200:       gosub   NXCHR         ; point to next byte in storage
               gosub   GTBYTA
               b=a     wpt
               s8=     0             ; assume is even record length
@@ -1472,6 +1465,59 @@ EMROOM2:      gosub   LB_33E9       ; set the stage
               a=0     x
 LB_5678:      gosub   `BIN-D`
 LB_567A:      golBank1H RCL
+
+              .public CAT_END3_2
+CAT_END3_2:   gosub   ENCP00
+              s8=     0
+              gosub   IAUALL        ; printer rom
+              goto    LB_3F9C
+              c=0
+              pt=     6
+              lc      6
+              lc      15
+              lc      15
+              lc      12
+              cxisa
+              pt=     0
+              c=c-1   pt
+              c=c-1   pt
+              gosub   UNL           ; send unlisten
+              goto    LB_3FC8
+LB_3F9C:      gosub   GETPCA
+              gosub   INCAD
+              b=a     wpt
+              gosub   INCAD
+              gosub   NXBYTA
+              st=c
+              pt=     1
+              c=c+1   pt
+              goc     LB_3FC8
+              pt=     3
+              acex    wpt
+              m=c
+              ?s5=1
+              goc     LB_3FC8
+              abex    wpt
+              gosub   CPGMHD
+              c=m
+              bcex    wpt
+              gosub   CNTBY7
+              ldi     16
+              dadd=c
+              a=0     s
+              gosub   GENNUM
+              gosub   ENLCD
+              abex    s
+              b=a     s
+              a=a-1   s
+LB_3FC0:      rabcr
+              a=a-1   s
+              gonc    LB_3FC0
+              abex    s
+              acex    m
+              rcr     13
+              gosub   GENN55
+LB_3FC8:      golBank1 END3
 
               .fillto 0x800
               .public EMDIRX2
@@ -3155,9 +3201,9 @@ LB_5FA6:      ldi     11
               nop
               nop
               nop
-              enrom1
+ENBNK1:       enrom1
               rtn
-              enrom2
+ENBNK2:       enrom2
               rtn
 LB_5FCB:      a=c     x
               c=b     x
