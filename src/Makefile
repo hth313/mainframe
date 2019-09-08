@@ -10,8 +10,8 @@ all: $(MOD_CL)
 %-cl.o: %.s
 	asnut -DHP41CX --cpu=newt -g --list-file=$(*F)-cl.lst $< -o$@
 
-$(MOD_CL): $(OBJS_CL) 41cx.scm 41cx.moddesc
-	lnnut -g -l --output-format=MOD2 $(OBJS_CL) 41cx.scm 41cx.moddesc --output-file=$@
+$(MOD_CL): $(OBJS_CL) 41cx.scm 41cl.moddesc
+	lnnut -g -l --output-format=MOD2 $(OBJS_CL) 41cx.scm 41cl.moddesc --output-file=$@
 
 clean:
 	-rm $(OBJS_CL) $(MOD_CL)  *.lst
