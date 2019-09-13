@@ -1099,8 +1099,8 @@ ERRNE:        gosub   ERROR
 ; *      chip 0 enabled
 ; * may exit to ERRAD or ERRNE
 ; *************************************************
-BCDBIN:       c=c-1   S             ; check for character
-              c=c-1   S
+BCDBIN:       c=c-1   s             ; check for character
+              c=c-1   s
               golc    ERRAD
               a=c     x             ; move exponent
               c=0     s
