@@ -909,10 +909,9 @@ COLDST:       sethex
 ; * Is the lcd enable in the next line really necessary?
               gosub   ENLCD
               gosub   RSTKB
-              ldi     0x3ff         ; set up A.X for ILOOP
-; * I think this constant could just as well be @777, which would
-; * result in faster cold starts, but for now i'm leaving well enough
-; * alone.  DRC 3/26/79
+              ldi     0x1ff         ; set up A.X for ILOOP
+; * There is no need to clear the extended memory apart from some registers
+; * in the first module which is covered by this range.
               a=c
               c=0
               wrten                 ; clear annunciators
