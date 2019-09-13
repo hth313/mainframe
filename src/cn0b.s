@@ -377,8 +377,7 @@ NFRX:                               ; !! assumes chip 0 on
 ;         original source, so I added that. 17/May/2017
               .public PCTOC
 PCTOC:        c=stk
-              stk=c                 ; hth313: this could just be gotoc
-              rtn
+              gotoc
 
               .fillto 0xda
 NFRXY:                              ; !!    assumes chip 0 on
