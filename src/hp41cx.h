@@ -421,6 +421,7 @@ WAITS:        .equlab 0x741a
               .extern `X-YMDD`
               .extern `X<256`
               .extern `X<999`
+              .extern `X<MAX_XMEM`
               .extern `X<=NN? 2`
               .extern `X<NN? 2`
               .extern `X=NN? 2`

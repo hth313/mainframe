@@ -1,0 +1,181 @@
+;;; Test for extra extended memory
+
+.import 41cx
+
+LBL "XMEM"
+
+; Ensure expected amount of registers starting out fresh.
+; In this initial from MEMORY LOST stage, the number is generated
+; by a #define, so it is statically calculated. Nevertheless, it
+; should be correct.
+EMROOM
+3405
+X!=Y?
+SF 99
+
+; Ask for size again, this time the memory is linked and set up, so now
+; it is actually dynamically calculated.
+EMROOM
+X!=Y?
+SF 99
+
+; Create a huge file to test FLSIZE can return such number
+"XX"
+3401
+CRFLD
+FLSIZE
+X!=Y?
+SF 99
+PURFL
+
+; Create a data file that fits into the first module:   "D1 120"
+"D1" 120 CRFLD
+
+XEQ 07        ; validate the registers
+
+3283    ; check that is took the expected number of registers
+EMROOM
+X!=Y?
+SF 99
+
+; Create  an ASCII file that starts in base module and stretch far into
+; the first extra module
+"A1" 200 CRFLAS
+
+3081
+EMROOM
+X!=Y?
+SF 99
+
+; Add some text to the file.
+"X-MEMORY OK"
+APPREC
+
+1387
+ASROOM
+X!=Y?
+SF 99
+
+
+; Create a large data file, spanning over several pages
+"D2" 1000 CRFLD
+
+XEQ 07        ; validate the registers
+
+2079
+EMROOM
+X!=Y?
+SF 99
+
+; Grow the first file
+"D1" 0 SEEKPTA
+127 RESZFL
+XEQ 07
+
+2072
+EMROOM
+X!=Y?
+SF 99
+
+"D2" 1000   ; This one should still work
+XEQ 07
+
+"D3" 275 CRFLD
+XEQ 07
+
+1795
+EMROOM
+X!=Y?
+SF 99
+
+"D2" 0 SEEKPTA
+1300 RESZFL
+XEQ 07
+
+"D3" 275
+XEQ 07
+
+1495
+EMROOM
+X!=Y?
+SF 99
+
+; Shrink the large file by 401 registers to 899 in size
+"D2" 0 SEEKPTA
+899 RESZFL
+XEQ 07
+
+"D3" 275
+XEQ 07
+
+1896
+EMROOM
+X!=Y?
+SF 99
+
+; Shrink first file
+"D1" 0 SEEKPTA -50 RESZFL
+CHS XEQ 07
+"D2" 899
+XEQ 07
+"D3" 275
+XEQ 07
+
+1973
+EMROOM
+X!=Y?
+SF 99
+
+; Check file sizes
+"D1"
+50
+FLSIZE
+X!=Y?
+SF 99
+
+"D2"
+899
+FLSIZE
+X!=Y?
+SF 99
+
+"D3"
+275
+FLSIZE
+X!=Y?
+SF 99
+
+"A1"
+200
+FLSIZE
+X!=Y?
+SF 99
+
+; Check the ASCII file
+0
+SEEKPTA
+CLA
+ARCLREC
+PROMPT
+
+; Assume selected data file and its size in X.
+; Write numbers to all registers and test that we can read them
+; back properly.
+LBL 07
+1 - E3 /      ; set up loop counter
+STO 01   STO 02
+0 SEEKPTA     ; reset pointer to start of file
+LBL 08        ; first loop, set values in registers
+RCL 01
+SAVEX
+ISG 01
+GTO 08
+0 SEEKPT      ; reset pointer to start of file
+LBL 09        ; second loop, check values
+RCL 02  GETX
+X!=Y?
+SF 99         ; differs
+ISG 02
+GTO 09
+
+END

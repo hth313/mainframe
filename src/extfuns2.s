@@ -753,7 +753,7 @@ RESZFL2:      gosub   LB_33E9
               c=c-1   s
               golong  FLTPER
               s7=     1
-LB_5304:      gosub   `X<999`
+LB_5304:      gosub   `X<MAX_XMEM`
               ?c#0    x
               golong  ERRDE
               b=a     x

@@ -585,13 +585,13 @@ INT10:        bcex    x
               gosub   CHK_NO_S      ; see if it is a number
               sethex
               a=c
-              ?a#0    xs            ; is the number < 1 ?
-              goc     INT20         ; yes, its integer is zero anyway
-              ldi     3
-              ?a<c    x             ; is the number < 1000 ?
+              nop
+              nop
+              ldi     4
+              ?a<c    x             ; is the number < 10000 ?
 INTER:        gonc    INT_DE        ; no, say "DATA ERROR"
-              acex
-INT20:        gosub   BCDBIN        ; convert the number to binary
+              nop
+INT20:        gosub   XBCDBIN       ; convert the number to binary
               a=c     x             ; A.X = the binary of the number
               ?a<b    x             ; is the number too big ?
               gonc    INTER
@@ -794,15 +794,11 @@ LB_32FF:      golong  ALM210
 ;;; *          memory
 ;;; *   output : A[3:0] = # of bytes
 ;;; *            if S2=1, memory discontinuity detected
-;;; *   used A[7:0], B[3:0], C, PT=3, S2, S3,   +1 sub level
+;;; *   used A[12:0], B[3:0], C, PT=3, S2, S3,   +1 sub level
 
               .public CNTBYE, CNTBY7
-CNTBYE:       c=b     x
-              ?a#c    xs            ; two addresses in the same module?
-              gonc    CNTBY7        ; yes
-              a=0     m             ; A[12:10]= 0
-                                    ; we use this for counting registers in
-                                    ;  modules completely crossed
+CNTBYE:       gosub   StartCNTBYE
+              goto    CNTBY7        ; P+1 two addresses in the same module
 CTBE10:       gosub   NXTMDL        ; advance to next module
               c=b     xs
               ?a#c    xs            ; are we in end module yet ?
@@ -812,10 +808,10 @@ CTBE10:       gosub   NXTMDL        ; advance to next module
 
 CTBE30:       b=a     xs            ; force to the same module
               a=a-b   x             ; A.X = # of regs in next module
-              acex    m             ; C[12:10]= # registers in modules crossed
+              c=a     m             ; C[12:10]= # registers in modules crossed
               rcr     10            ; C.X = # registers in modules crossed
-              a=a+c   x             ; add # regisster in modules crossed
-              b=a     x             ; B.X= # of regs over stating module
+              a=a+c   x             ; add # register in modules crossed
+              b=a     x             ; B.X= # of regs over starting module
               acex
               a=c
               rcr     4             ; C[3:0]=starting addr
@@ -1114,51 +1110,54 @@ NXTMDL:       c=a                   ; save A[3:0] to A[7:4]
               a=c
               lowestAddress
               dadd=c
-              ldi     0x2ef
-              a=c     x
-              c=data                ; get lowest reg of the module
+              c=data                ; read lowest reg of the module
               rcr     3             ; C.X = next module addr
-              pt=     1
-              ?a#c    x             ; next module addr = 2EF ?
-              gonc    NXMD05        ; yes
-              a=a+1   xs            ; A.X = hex 3EF
-              ?a#c    x             ; next module addr = 3EF ?
-              gonc    NXMD05        ; yes
-              a=a+1   pt            ; check if it ends with FF
-              ?a#c    wpt
-              goc     NXMD10        ; no, no next module connected
-              acex    x             ; yes, module 4 or up, highest address X00
-              a=0     wpt
-              goto    NXMDRT
-
-;;; * At this point, A.X=C.X=NEF where N=2 or 3.
-NXMD05:       a=0     wpt
-              a=a+1   wpt
-              goto    NXMDRT
-NXMD10:       a=0     x             ; no next module
-
-;;; * NXMDRT set pt=3 and return
-NXMDRT:       pt=     3
+              acex    x             ; A.X = next module addr
               rtn
 
 ;;; **********************************************************************
-;;; * pageSize - get number of registers in a module
-;;; *   input  : A.X = highest register address within module
-;;; *          : A[12:10] = assumed to be a module counter
-;;; *   output : C[12:10] = number of registers in a module
-;;; *          : A[12:10] = updated with this module
-;;; *            PT = 4
-;;; *   used C, PT=4   +0 sub levels
-pageSize:     c=0
-              pt=     0
-              ldi     238
-              ?a#0    pt
-              rtn     c
-              ldi     255
-10$:          pt=     4
-              rcr     -10           ; C[12:10]= # registers in this module
-              a=a+c                 ; A[12:10]= updated registers in modules between
+;;; XBCDBIN - Convert small BCD number to binary
+;;; The built-in BCDBIN cannot handle numbers larger than 999, this
+;;; routine can. By Ken Emery / Skwid, reference PPCCJ V11N5P6
+;;; Note: This one has been trimmed and adjusted further to support the
+;;; actual use-case here rather than being a proper support routine.
+;;; This is mainly due to lack of space.
+XBCDBIN:      ?a#0    xs            ; is the number < 1 ?
+              goc     20$           ; yes, return 0
+              ldi     2
+              acex
+              ?a<c    x
+              golnc   BCDBIN        ; within range for BCDBIN
+
+              rcr     13            ; save 1000's digit in A.S
+              a=c     s
+              rcr     10            ; prepare for GOTINT/INTINT
+              c=0     m
+              rcr     2             ; save a subroutine level
+              gosub   INTINT
+              gosub   INTINT
+              a=c     x             ; A.X= result so far
+              ldi     1000          ; prepare for adding 1000's
+              a=a-1   s
+10$:          a=a+c   x             ; loop to pump up the 1000's
+              a=a-1   s
+              gonc    10$
+              acex    x             ; C.X= result
               rtn
+20$:          c=0     x
+              rtn
+
+;;; * Broken out part of CNTBYE to preserve entry point offsets.
+StartCNTBYE:  c=b     x
+              ?a#c    xs
+              rtn nc
+              pt=     3             ; A[12:10]= 0
+              c=0     m             ; we use this for counting registers in
+              acex    wpt           ;  modules completely crossed
+              acex
+              c=stk                 ; could use RETP2, but we have space here
+              c=c+1   m
+              gotoc
 
               .fillto 0x476
 ;;; **********************************************************************
@@ -2474,8 +2473,8 @@ CRFLD:        s7=     0
 
               .name   "CRFLAS"
 CRFLAS:       s7=     1
-CRFL10:       gosub   `X<999`       ; get the requested size and check
-                                    ; if it is <= 999
+CRFL10:       gosub   `X<MAX_XMEM`  ; get the requested size and check
+                                    ; if it is <= MAX_XMEM
               ?c#0    x             ; file size = 0 ?
               golong  ERRDE         ; yes, say "DATA ERROR"
               pt=     13            ; put the file type to C.S
@@ -2827,6 +2826,43 @@ KYFC30:       c=a+c   m
               .public LB_3B10
 LB_3B10:      gosub   OFSHFT10      ; Patch for HP-41CX, turn off shift before
               golong  NAM44_        ; going to NAM44_
+
+;;; **********************************************************************
+;;; * X<MAX_XMEM - routine to get int(X) and check if int(X) < MAX(XMEM)
+;;; *   input  : chip 0 enable
+;;; *   output : A.X = C.X = int(decimal number)
+;;; *   used  A, B.X, C, S8    +2 sub levels
+              .public `X<MAX_XMEM`
+`X<MAX_XMEM`: c=regn  3
+              a=c
+#if XMEM_REGISTERS - 2 <= 0x3ff
+              ldi     XMEM_REGISTERS - 2
+#else
+              pt=     2
+              lc      .nib2 (XMEM_REGISTERS - 2)
+              lc      .nib1 (XMEM_REGISTERS - 2)
+              lc      .nib0 (XMEM_REGISTERS - 2)
+#endif
+              golong   INT10
+
+;;; **********************************************************************
+;;; * pageSize - get number of registers in a module
+;;; *   input  : A.X = highest register address within module
+;;; *          : A[12:10] = assumed to be a module counter
+;;; *   output : C[12:10] = number of registers in a module
+;;; *          : A[12:10] = updated with this module
+;;; *            PT = 4
+;;; *   used C, PT=4   +0 sub levels
+pageSize:     c=0
+              pt=     1
+              ldi     238
+              ?a#c    pt
+              gonc    10$
+              ldi     255
+10$:          pt=     4
+              rcr     -10           ; C[12:10]= # registers in this module
+              a=a+c                 ; A[12:10]= updated registers in modules between
+              rtn
 
               .fillto 0xb28
               .name   "GETKEYX"
@@ -3292,9 +3328,9 @@ EFLS80:       b=a     x             ; B <- registers left in present module
               gonc    EFLS90        ; no
 
               ldi     238           ; assumed page size
-              pt=     0
-              ?a#0    pt            ; is it page 2 or 3? (check if xx1)
-              goc     EFLS81        ; yes, size is 238
+              pt=     1
+              ?a#c    pt            ; is it page 2 or 3? (check if xEx)
+              gonc    EFLS81        ; yes, size is 238
               ldi     255           ; no, size is 255
 EFLS81:       acex    x             ; add contributed size to B.X
               a=a+b   x
@@ -3365,7 +3401,7 @@ DLRC10:       gosub   CURFLT        ; get current file
               gonc    DLRC50        ; no, is for "DELREC"
               c=0
               dadd=c
-              gosub   `X<999`       ; get integer of X
+              gosub   `X<MAX_XMEM`  ; get integer of X
               c=m                   ; save int(X) in M.X
               acex    x
               m=c
@@ -3852,7 +3888,7 @@ SEKPTA:       s0=     1
 SKPT10:       gosub   FLSHAP
               c=0
               dadd=c
-              gosub   `X<999`       ; get integer of X in binary
+              gosub   `X<MAX_XMEM`  ; get integer of X in binary
               rcr     10
               bcex    m             ; B[6:4]= given pointer
               a=0     s
