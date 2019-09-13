@@ -790,7 +790,7 @@ CTBE30:       c=0     x
 CTBE40:       b=a     xs            ; force to the same module
               a=a-b   x             ; A.X = # of regs in next module
               a=a+c   x             ; add 238 if crossed 3 modules
-              b=a     x             ; B.X= # of regs over stating module
+              b=a     x             ; B.X= # of regs over starting module
               acex
               a=c
               rcr     4             ; C[3:0]=starting addr
