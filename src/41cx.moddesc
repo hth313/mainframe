@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ModFile FileFormat="MOD1" Title="HP-41CX" Version="NFL" PartNumber="" Author="Hewlett-Packard" Copyright="public domain" License="public domain" Comments="HP-41CX mainframe ROMs" Category="1" Hardware="3">
+<ModFile FileFormat="MOD1" Title="HP-41CX" Version="NFL" PartNumber="" Author="Hewlett-Packard" Copyright="Hewlett-Packard" License="NOMAS" Comments="HP-41CX mainframe ROMs" Category="1" Hardware="3" MemoryModules="0" XMemoryModules="0">
   <Page Name="NUT0" Identity="N" Page="0" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
   <Page Name="NUT1" Identity="F" Page="1" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
   <Page Name="NUT2" Identity="L" Page="2" PageGroup="0" Bank="1" BankGroup="0" RAM="0" WriteProtect="0" FAT="0"/>
