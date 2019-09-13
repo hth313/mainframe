@@ -221,6 +221,7 @@ xdef          .macro X
               .extern INT
               .extern INTARG
               .extern INTFRC
+              .extern INTINT
               .extern IORUN
               .extern ISG
               .extern KEYOP
