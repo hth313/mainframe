@@ -955,7 +955,7 @@ LB_541B:      pt=     11
 LB_5421:      c=0
               pt=     7
               lc      2
-LB_5424:      chk     kb
+LB_5424:      chk kb
               goc     LB_5430
               ?lld
               gonc    LB_542A
@@ -1811,7 +1811,7 @@ AROT30:       c=n
 GETKEY2:      c=0
               pt=     3             ; set counter for 10 sec. time out
               lc      4
-GTKE10:       chk     kb
+GTKE10:       chk kb
               goc     GTKE20
               c=c-1
               gonc    GTKE10        ; not time out yet

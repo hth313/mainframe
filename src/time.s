@@ -196,7 +196,7 @@ TERR20:       bcex    x             ; B.X= character to add
               gosub   ENLCD
               frsabc
               c=b     x
-              SLSABC                ; add blank, X, Y or Z to display
+              slsabc                ; add blank, X, Y or Z to display
 
               .public TERR50
 TERR50:       gosub   TMSG          ; print and set message flag
@@ -1307,7 +1307,7 @@ ALMSG:        s8=     1
               .public INITMM, INITMR, INITM1
 INITMM:       m=c
 INITMR:       gosub   ENTMR         ; save a sub levelm PT=A
-INITM0:       startc      ; start main clock
+INITM0:       startc                ; start main clock
 INITM1:       rdsts                 ; read hardware status
               st=c                  ; ST= hardware status
               pt=b

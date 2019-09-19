@@ -1903,7 +1903,7 @@ LB_3723:      a=a+1   xs
               ?c#0    pt
               golc    LB_37A4
               ldi     900
-LB_373C:      chk     kb
+LB_373C:      chk kb
               goc     LB_3741
               c=c-1   x
               gonc    LB_373C
