@@ -1908,7 +1908,7 @@ LB_3723:      a=a+1   xs
               golc    LB_37A4
               ldi     900
               .newt_timing_start
-LB_373C:      chk     kb
+LB_373C:      chk kb
               goc     LB_3741
               c=c-1   x
               gonc    LB_373C
