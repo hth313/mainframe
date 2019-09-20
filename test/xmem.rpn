@@ -26,6 +26,13 @@ CRFLD
 FLSIZE
 X!=Y?
 SF 99
+3000
+SEEKPTA   ; verify that we can seek large numbers (above 999)
+SAVEX     ; step ahead 1
+3001
+RCLPT     ; can we get large updated file pointer back?
+X!=Y?
+SF 99
 PURFL
 
 ; Create a data file that fits into the first module:   "D1 120"
