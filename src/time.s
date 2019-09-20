@@ -1784,7 +1784,7 @@ T24H20:       a=0     xs
 
               .public `C=T+D`, `C=T+D0`
 `C=T+D`:      s1=     0             ; don't add X or Y to "DATA ERROR"
-`C=T+D0`:     sel     q
+`C=T+D0`:     sel q
               pt=     13
               sel p
               gosub   SDHMSC        ; A= day, hr, min, sec
@@ -4723,7 +4723,7 @@ DSPTMD:       s2=     0
               sel q
               pt=     7             ; display minutes
               goto    DSPTM5
-DSPTIM:       sel     q
+DSPTIM:       sel q
               pt=     5             ; display seconds
 DSPTMP:       s2=     1
 DSPTM5:       sel p                 ; A= DDDDDDHHMMSSCC
