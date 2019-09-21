@@ -994,6 +994,7 @@ LB_5461:      c=c+1   x
               gosub   LB_3299
               goto    LB_542C
 
+              .fillto 0x0468        ; ensure entry offset stays here
               .public GTRC05
 GTRC05:       gosub   CURFLT        ; get current text file
               s5=     1

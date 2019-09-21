@@ -1988,6 +1988,7 @@ LB_3785:      golnc   LB_36C0
               goto    LB_3774
 
               .public LB_3790
+              .fillto 0x790
 LB_3790:      gosub   CLLCDE
               gosub   MESSL
               .messl  "CAT EMPTY"
@@ -3210,6 +3211,7 @@ EMDR80:       gosub   CLLCDE
 ;;; * uses  A, B.S, B[6:0], C, N, S0, S1, S2, PT   +2 sub levels
               .public EFLSCH, FSCHT, FSCHP, RFLSCH
               .public CURFL, CURFLD, CURFLT, CURFLR, EFLS02
+              .fillto 0x0c8f
 CURFLR:       pt=     13
               lc      2
               goto    CURFL0
