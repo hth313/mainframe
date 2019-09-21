@@ -1510,7 +1510,7 @@ LB_3FC8:      golBank1 END3
               .public EMDIRX2
 EMDIRX2:      gosub   LB_3260
               ?c#0    x
-              golong  ERRDE
+              golnc   ERRDE
               a=c     x
               gosub   CLA
               gosub   LB_33EE
