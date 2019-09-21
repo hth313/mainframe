@@ -924,9 +924,56 @@ LB_53C4:      acex    x
               goc     LB_53C4
               goto    LB_53A7
 
-              .fillto 0x400
+;;; * NOTE: EMDIR2 has changed compared to before.
+;;; * The split between page 3 and 5.2 is no longer in the same place and it
+;;; * probably does not make sense to preserve it as it was not a proper entry
+;;; * to start with. EMDIR is still in page 3.
+;;; * Also there is a possibility that further changes are needed, so lets be
+;;; * flexible here.
+
               .public EMDIR2
-EMDIR2:       pt=     11
+EMDIR2:       gosub   EMDR27
+;;; * File types for extended memory:
+;;; *  0 @ - undefined
+;;; *  1 P - Program file
+;;; *  2 D - Data file
+;;; *  3 A - Text (ASCII) file
+;;; *  4 M - CCD matrix file
+;;; *  5 B - I/O buffer file
+;;; *  6 K - Key assignments file
+;;; *  7 S - Status registers
+;;; *  8 Z - Complex stack for 41Z
+;;; *  9 L - LIFO file (for Doug Wilder's LIFO functions)
+;;; * 10 F - Forth code
+;;; * 11 H - Binary stack for HP-16C
+;;; * 12 W - Write all registers file
+;;; * 13 @ - undefined
+;;; * 14 @ - undefined
+;;; * 15 @ - undefined
+
+              .text   "@PDAMBKSZLFHW@@@" ; file type table
+EMDR27:       c=n
+              rcr     11
+              c=0     m
+              rcr     13
+              a=c     m
+              c=stk
+              c=c+a   m
+              cxisa                 ; fetch filetype
+              slsabc                ; send file type character to display
+              c=n                   ; send file size
+              pt=     13
+              lc      4             ; digits = C.S - A.S
+              acex
+              a=a-c   s             ; A.S = # of digits (3 or 4)
+              gosub   GENNUM
+              gosub   ENCP00
+              c=regn  8
+              c=0     s
+              regn=c  8
+              gosub   PRT12
+
+              pt=     11
               ?b#0    pt
               goc     LB_5421
               chk kb

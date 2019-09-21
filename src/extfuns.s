@@ -2912,27 +2912,20 @@ EMDR20:       c=m                   ; send the file name to the display
               gosub   ASCLCD        ; send the ASCII to display
               a=a-1   m             ; done with 7 chars ?
               gonc    EMDR20        ; not yet
-              ldi     32
-              slsabc                ; send a blank
               c=n
-              ldi     256           ; start at 256 so that dividing by 4
-                                    ;  twice will get it to to 16 for ASCII P
-EMDR30:       c=c+c   x             ; divide by 4 to get next
-              c=c+c   x             ;  file type character
-              csr     x             ; C.X = 4 (D) or 1 (A)
-              c=c-1   s             ; file type reached zero yet ?
-              gonc    EMDR30        ; no, divide and decrement again
-DSFLTP:       slsabc                ; send file type character to display
-              c=n                   ; send file size
-              pt=     13
-              lc      3
-              a=c                   ; 3 digits for file size
-              gosub   GENNUM
-              gosub   ENCP00
-              c=regn  8
-              c=0     s
-              regn=c  8
-              gosub   PRT12
+              a=c
+              a=0     s             ; assume large file (file size > 999)
+              ldi     1000
+              ?a<c    x
+              gonc    EMDR25
+              a=a+1   s             ; small file, use 3 digits for file size
+              ldi     32            ; send a blank separator
+              goto    EMDR26
+EMDR25:       frsabc                ; large file, fetch last character
+              cstex
+              s6=1                  ; set the period bit
+              cstex
+EMDR26:       slsabc                ; add space or period to display
               enrom2
               golong  EMDIR2
 
