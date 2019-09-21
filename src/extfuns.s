@@ -1165,7 +1165,7 @@ StartCNTBYE:  c=b     x
 ;;; *   input  : A[3:0] = addr of current record length
 ;;; *            PT= 3
 ;;; *   output : A[3:0] = first byte addr or next record
-;;; *   used A[7:0], B[3:0], C, S2, PT,  +1 sub level
+;;; *   used A[7:0], B[3:0], C, PT,  +1 sub level
 ;;; * ADVREB - similar to "ADVREC" except the record length in B.X as input
               .public ADVREC, ADVREB
 ADVREC:       gosub   GTBYTA
@@ -1195,9 +1195,8 @@ ADVREB:       abex    x             ; A.X= record length
 ;;; *            B[3]   = plus half of this # of bytes
 ;;; *   output : A[3:0] = advanced address
 ;;; *            PT = 3
-;;; *            if S2 = 1, discontinuity detected in memory
 ;;; *            if A.X = 0, memory overflow
-;;; *   used A[7:0], B[3:0], C, S2, PT=3,   +1 sub level
+;;; *   used A[7:0], B[3:0], C, PT=3,   +1 sub level
 ;;; * ADVAD1 - advance one register in external memory
 ;;; *   input  : A[3:0] = current address
 ;;; *   output : same as "ADVADR"
@@ -1553,7 +1552,6 @@ LB_35AA:      sethex
 ;;; *            B[6:4] = last record # + 1
 ;;; *            B[13:10] = current or last record addr
 ;;; *            if S1=1 - file empty
-;;; *            if S2=1 - memory discontinuity detected
 ;;; *   used  A[7:0], B, C, S0, S1, S2, PT=3    +2 sub levels
 ;;; * CUREC# - routine to get the addr of current record
 ;;; *   input  : N = file header
