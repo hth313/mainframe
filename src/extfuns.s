@@ -2466,7 +2466,7 @@ CRFLAS:       s7=     1
 CRFL10:       gosub   `X<999`       ; get the requested size and check
                                     ; if it is <= 999
               ?c#0    x             ; file size = 0 ?
-              golong  ERRDE         ; yes, say "DATA ERROR"
+              golnc   ERRDE         ; yes, say "DATA ERROR"
               pt=     13            ; put the file type to C.S
               lc      2             ; data file type = 2
               ?s7=1                 ; create an ascii file ?

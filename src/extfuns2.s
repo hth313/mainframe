@@ -1467,7 +1467,7 @@ LB_567A:      golBank1H RCL
               .public EMDIRX2
 EMDIRX2:      gosub   LB_3260
               ?c#0    x
-              golong  ERRDE
+              golnc   ERRDE
               a=c     x
               gosub   CLA
               gosub   LB_33EE
