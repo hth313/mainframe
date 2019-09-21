@@ -733,9 +733,9 @@ RESZFL2:      gosub   LB_33E9
               dadd=c
               c=regn  9
               b=a     m
-              abex    x
+              abex    x             ; A.X= registers available
               acex
-              regn=c  9
+              regn=c  9             ; [10:8]=end of memory pointer, [2:0]=registers available
               ldi     64
               dadd=c
               acex
@@ -753,61 +753,48 @@ RESZFL2:      gosub   LB_33E9
               c=c-1   s
               golong  FLTPER
               s7=     1
-LB_5304:      gosub   `X<MAX_XMEM`
-              ?c#0    x
-              golong  ERRDE
-              b=a     x
-              c=n
-              ?a#c    x
-              golnc   TOBNK1
+LB_5304:      gosub   `X<MAX_XMEM`  ; get sanity checked new size
+              ?c#0    x             ; size is 0?
+              golnc   ERRDE         ; yes, DATA ERROR
+              b=a     x             ; B.X= new size
+              c=n                   ; C.X= current size
+              ?a#c    x             ; same size as before?
+              golnc   TOBNK1        ; yes, we are done
               pt=     3
-              ?a<c    x
-              golc    LB_5369
-              a=a-c   x
+              ?a<c    x             ; shrinking the file ?
+              golc    LB_5369       ; yes
+              a=a-c   x             ; no, A.X= number of registers to grow it
               c=regn  9
               acex    x
-              ?a<c    x
-              golc    NO_ROOM
+              ?a<c    x             ; space left?
+              golc    NO_ROOM       ; no
               m=c
               c=n
-              rcr     10
+              rcr     10            ; C.X= file header address
               a=c     x
-              dadd=c
+              dadd=c                ; select file header
               rcr     4
-              c=c+1   x
-              bcex    x
-              data=c
+              c=c+1   x             ; C.X= old size + 1
+              bcex    x             ; put new size in file header
+              data=c                ; write it back
               a=0     pt
               b=0     pt
-              gosub   ADVADR
+              gosub   ADVADR        ; A.X= first register beyond the file (now)
               acex
-              cmex
-              bcex    x
-              rcr     8
-              n=c
-              a=c     x
+              cmex                  ; M.X= first register beyond the file (now)
+              bcex    x             ; B.X= number of registers to grow it
+              rcr     8             ; C.X= first available register address
+              n=c                   ; N.X= first available register address
+              a=c     x             ; A.X= first available register address
               a=0     pt
-              gosub   ADVADR
+              gosub   ADVADR        ; A.X= end of memory after growing file
               c=n
-              bcex    x
-              ?s2=1
-              gonc    LB_5349
-              b=a     x
-              s2=     0
-              ldi     64
-              a=c     x
-10$:          gosub   NXTMDL
-              c=b     x
-              ?a#c    xs
-              gonc    LB_5346
-              pt=     1
-              a=0     wpt
-              a=a+1   wpt
-              goto    10$
-LB_5346:      abex    x
-              c=n
-              bcex    x
-LB_5349:      c=b     x
+              bcex    x             ; B.X= first available register address
+
+;;; * A.X = destination (write) pointer
+;;; * B.X = source (read) pointer
+;;; * M.X = first register beyond the original file (before growing)
+LB_5349:      c=b     x             ; block move loop
               dadd=c
               c=data
               acex    x
@@ -819,9 +806,8 @@ LB_5349:      c=b     x
               ?a#c    x
               goc     LB_5361
               abex    x
-LB_5355:      gosub   BSTEP_EM
-              acex    x
-              a=c     x
+LB_5355:      gosub   BSTEP_EM      ; fill new area with 0
+              c=a     x
               dadd=c
               c=0
               data=c
@@ -829,13 +815,14 @@ LB_5355:      gosub   BSTEP_EM
               ?a#c    x
               goc     LB_5355
               golong  TOBNK1
-LB_5361:      s0=     0
-LB_5362:      gosub   BSTEP_EM
+LB_5361:      s0=     0             ; doing first pointer (swapped)
+LB_5362:      gosub   BSTEP_EM      ; step back one of the pointers
               ?s0=1
-              goc     LB_5349
-              abex    x
-              s0=     1
+              goc     LB_5349       ; loop again
+              abex    x             ; swap pointers
+              s0=     1             ; doing second pointer (not swapped)
               goto    LB_5362
+
 LB_5369:      c=c+1   x
               bcex    x
               n=c
