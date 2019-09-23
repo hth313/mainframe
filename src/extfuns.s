@@ -3145,9 +3145,13 @@ EMDR20:       c=m                   ; send the file name to the display
               a=a+1   s             ; small file, use 3 digits for file size
               ldi     32            ; send a blank separator
               goto    EMDR26
-EMDR25:       frsabc                ; large file, fetch last character
-              cstex
-              s6=1                  ; set the period bit
+EMDR25:       ldi     32
+              a=c     x
+              frsabc                ; large file, fetch last character
+              ?a#c    x             ; is it a space?
+              gonc    EMDR26        ; yes
+              cstex                 ; no, set the period bit
+              s6=1
               cstex
 EMDR26:       slsabc                ; add space or period to display
               enrom2
