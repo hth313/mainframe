@@ -68,9 +68,13 @@
 
               legal
 
+              .newt_timing_start    ; to synchronize NEWT Time clone at start up
+
               golnc   LSWKUP
 
               golong  DSWKUP
+
+              .newt_timing_end
 
 ; **************************************************
 ; * The following routine takes a binary register
@@ -618,6 +622,7 @@ DRSY30:       s4=     0             ; clear SSTFLAG
 ; * Light sleep wakeup logic
 ; *
               .public LSWKUP
+              .newt_timing_start    ; to synchronize NEWT Time clone at start up
 LSWKUP:       gosub   0x4000        ; gosub diagnostic
 
               gosub   PACH11        ; leaves SS0 up
@@ -628,6 +633,7 @@ WKUP10:       chk kb
               goc     WKUP20
               ldi     8             ; I/O service
               gosub   ROMCHK        ; needs chip 0,SS0,hex,P selected
+              .newt_timing_end
 
               ?s2=1                 ; I/O flag?
               goc     WKUP10        ; yes
@@ -689,6 +695,7 @@ OFFXFR:       golong  OFF           ; yes
 ; * Deep sleep wakeup logic.
 ; *
               .public DSWKUP        ; wake up from deep sleep
+              .newt_timing_start    ; to synchronize NEWT Time clone at start up
 DSWKUP:       gosub   0x4000        ; GOSUB diagnostic
                                     ; chip 4
 
@@ -704,6 +711,7 @@ DSWKUP:       gosub   0x4000        ; GOSUB diagnostic
               goc     WKUP25        ; yes
               ldi     10            ; no
               gosub   ROMCHK
+              .newt_timing_end
 
               ?s2=1                 ; I/O flag?
               gonc    DRSY50        ; nope - go back to sleep
@@ -816,6 +824,7 @@ WKUP80:       disoff                ; turn off display during beep
 ; * If PC is in ROM, normally returns in 39 word-times.
 ; *
               .public MEMCHK
+              .newt_timing_start    ; to synchronize NEWT Time clone at start up
 MEMCHK:       rst kb                ; these three states
               chk kb                ; necessary because of
               sethex                ; problems with CPU wakeup
@@ -872,6 +881,7 @@ WKUP90:       rcr     6
               .public CHKRPC
 CHKRPC:       ?s10=1                ; ROM flag?
               rtn nc                ; no. all finished.
+              .newt_timing_end
               c=regn  12            ; GET PC
               c=0     x             ; C[3:0]=addr of 1st word
               rcr     11            ; on chip
@@ -1477,11 +1487,13 @@ PACH10:       gosub   BCDBIN
 ; * storage chip in CHKADR or FNDEND).
 ; *
               .public PACH11
+              .newt_timing_start    ; to synchronize NEWT Time clone at start up
 PACH11:       ldi     0x2fd
               dadd=c                ; enable nonexistent data chip 2FD
               pfad=c                ; enable display
               flldc                 ; non-destructive read
               golong  MEMCHK
+              .newt_timing_end
 
 ; *
 ; * PACH12 - Post-release fix to decompile on wakeup when machine goes
