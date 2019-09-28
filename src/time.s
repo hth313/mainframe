@@ -83,7 +83,7 @@ DOW30:        c=m                   ; C = 0D000000000000
               golong  NFRX
 
 ;;; **********************************************************************
-;;; * CHECK - checks data input for legailty                  1-30-81 RSW
+;;; * CHECK - checks data input for legality                  1-30-81 RSW
 ;;; *   Checks the C.X specified register for legal data, and returns only
 ;;; *   for numeric data.  Both the register and the output of "CHECK"
 ;;; *   will be a floating point number (C.S and C.XS- 0 or 9) with all
@@ -101,9 +101,7 @@ DOW30:        c=m                   ; C = 0D000000000000
               .public CHKXM, CHECKX, CHECK
 CHKXM:        m=c
 CHECKX:       ldi     3             ; address of "X" register
-CHECK:        .newt_timing_start
-              dadd=c
-              .newt_timing_end
+CHECK:        dadd=c
               gosub   P6RTN         ; B= massaged register contents
               c=b
               golong  CHK_NO_S      ; error if alpha data
@@ -991,9 +989,7 @@ SHFTD8:       a=c     x
 
               .public FNDMSG
 FNDMSG:       ldi     8
-              .newt_timing_start
               dadd=c                ; enable reg 8
-              .newt_timing_end
               acex    x             ; A.X= 8= register address
 ;;; * Note: Could save a state by setting C.S=3 and doing 'acex' at
 ;;; *       the expense of destroying A.M
@@ -2120,9 +2116,7 @@ CALCRC:       gosub   `GETR#`       ; C.X= active reg number
               .public GETMXP, `GETM.X`
 GETMXP:       pt=     1
 `GETM.X`:     c=m                   ; C.X= reg address
-              .newt_timing_start
               dadd=c
-              .newt_timing_end
               c=data
               rtn
 
@@ -4330,9 +4324,7 @@ CLRAL0:       ldi     0x29          ; don't clear ALM A, DTZB, PUS
               rdtime                ; C= main clock time
               a=c
               c=0
-              .newt_timing_start
               dadd=c
-              .newt_timing_end
               acex
               regn=c  9             ; reg 9= main clock time
               setdec
@@ -5053,9 +5045,7 @@ T12H40:       sethex
               .public `T=T+TP`
 `T=T+TP`:     a=c
               c=0
-              .newt_timing_start
               dadd=c
-              .newt_timing_end
               c=regn  9             ; C= old clock time
               bcex                  ; B = old clock time (begin of proc.)
               gosub   ENTMR         ; enable timer chip, PT=A
@@ -5309,9 +5299,7 @@ TRUN10:       alarm?
               gonc    TRUN40        ; no, alarm came during a function
               a=c                   ; A[11]= user flags 8-11
               c=0
-              .newt_timing_start
               dadd=c
-              .newt_timing_end
               c=regn  14
               pt=     11
               acex    pt            ; restore user flags 8-11
@@ -5363,9 +5351,7 @@ LSWK10:       pt=a                  ;  (save a sub level, partial key seq)
               ?s4=1                 ; doing clock display?
               gonc    LSWK65        ; no
 LSWK15:       c=0     x             ; yes, check for evidence of a key down
-              .newt_timing_start
               dadd=c
-              .newt_timing_end
               c=regn  14
               rcr     1
               cstex
@@ -5914,9 +5900,7 @@ ALM210:       gosub   ENTMR         ; enable timer chip, PT=A
 ALM215:       a=a+1   x             ; A.X= address of first alarm
               gosub   `NEWM.X`      ; C.X= M.X= address of first alarm
 
-ALM220:       .newt_timing_start
-              dadd=c
-              .newt_timing_end
+ALM220:       dadd=c
               c=data
               bcex    x             ; B.X= alarm information
               c=0     x
