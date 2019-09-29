@@ -874,7 +874,8 @@ STOFLAG:      goto    .+1
               nop
 
               .public CAT_STOP
-CAT_STOP:      c=keys
+              .newt_timing_start
+CAT_STOP:     c=keys
               rcr     3
               c=0     xs
               a=c     x
@@ -887,6 +888,7 @@ CAT_STOP:      c=keys
               golong  OFF
 1$:           ldi     135           ; R/S key
               rtn
+              .newt_timing_end
 
               .name   "GETKEY"
 GETKEY:       goto    .+1
