@@ -1467,7 +1467,7 @@ SKPT60:       s5=     1
               gonc    SKPT65        ; no
               ?c#0                  ; seek to pointer 0.0 ?
               gonc    SKPT70        ; yes, always allow seek to 0.0
-SKPT64:       golong  EOFL     ; no, say "END OF FL"
+SKPT64:       golong  EOFL          ; no, say "END OF FL"
 SKPT65:       gosub   GTFRA
               a=c     x             ; A.X = given char pointer
               c=m
@@ -2416,6 +2416,58 @@ KEEPPC:       c=0
               abex    wpt           ; put an "END" to the beginning of the ..
               golong  RP330         ; jump into "GETP" routine
 
+;;; * LowerCase - handle lower case and special characters
+
+LowerCase:    ldi     'A'
+              ?a<c    x
+              goc     5$            ; not a letter
+              ldi     'Z' + 1
+              ?a<c    x
+              goc     15$           ; a letter
+5$:           pt=     6             ; lower case table
+              lc      .nib3 LowerCaseTable
+              lc      .nib2 LowerCaseTable
+              lc      .nib2 LowerCaseTable
+              lc      .nib0 LowerCaseTable
+10$:          cxisa
+              ?c#0    x             ; end of table?
+              gonc    30$           ; yes
+              c=c+1   m
+              ?a#c    x             ; match?
+              gonc    20$           ; yes
+              c=c+1   m             ; no, point to next table entry
+              goto    10$
+15$:          ldi     0x20          ; handle letters
+              a=a+c   x             ; make lower case
+17$:          spopnd                ; drop return address
+              golong  LB_5E1D       ; go here instead
+20$:          cxisa                 ; use replacement character
+              a=c     x
+              goto    17$
+30$:          golong  BLINK1        ; not found in table
+
+LowerCaseTable:
+              .con    0x03d, 0x10c  ; shift-2       greek mu
+              .con    0x03f, 0x021  ; shift-3       | or !
+              .con    0x020, 0x101  ; shift-0       pi
+              .con    0x064, 0x05b  ; D             [
+              .con    0x065, 0x05d  ; E             ]
+              .con    0x07e, 0x01f  ; F             spat
+              .con    0x025, 0x040  ; G             @
+              .con    0x01d, 0x023  ; H             #
+              .con    0x03c, 0x028  ; I             (
+              .con    0x03e, 0x029  ; J             )
+              .con    0x05e, 0x027  ; N             '
+              .con    0x024, 0x022  ; P             "
+              .con    0x02d, 0x05f  ; -             _
+              .con    0x02b, 0x026  ; +             &
+              .con    0x02a, 0x060  ; *             t
+              .con    0x02f, 0x05c  ; /             \
+              .con    0x02c, 0x03b  ; shift-radix   ;
+              .con    0x03f, 0x021  ; shift-?       | or !
+              .con    0x03a, 0x100  ; shift-/       |-
+              .con    0             ; end of table
+
               .fillto 0xc00
               .public ED2
 ED2:          s0=     1
@@ -3059,7 +3111,7 @@ LB_5EE7:      gosub   LB_5B81
               goto    LB_5EEE
 LB_5EED:      s7=     1
 LB_5EEE:      golong  LB_5DCF
-LB_5EF0:      gosub   BLINK1
+LB_5EF0:      gosub   LowerCase
 LB_5EF2:      gosub   LB_5B81
               s7=     0
               c=st
@@ -3151,7 +3203,7 @@ LB_5F58:      gosub   LB_5B81
               gosub   LB_5A69
               golong  LB_5C1A
 LB_5F61:      c=c+1   x
-              goc     LB_5F51
+              goc     LB_5F4C
               gosub   LB_5B55
 LB_5F65:      c=n
               rcr     3
