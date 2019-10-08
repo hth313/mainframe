@@ -197,7 +197,7 @@ PUNC20:       c=cora
 ; *
 ; * MASK - convert an ASCII character to LCD character form
 ; *        (not including comma, period and colon)
-; * Called with ASCII in A[2:0]
+; * Called with ASCII in A[1:0]
 ; * Two calling sequences:
 ; * 1.     GOSUB MASK
 ; *        NOP
@@ -208,7 +208,7 @@ PUNC20:       c=cora
 ; *        <ANYTHING BUT NOP>
 ; *        Calling mask not followed by a NOP will cause the char
 ; *        being sent to display. Returns with chip 0 enabled.
-; *        USES A.X, B.S, C. 1 sub level. Assumes LCD enabled.
+; *        USES A.X, B.S, C, PT. 1 sub level. Assumes LCD enabled.
 ; *
 MASK:         a=0     xs
               ldi     0x20
