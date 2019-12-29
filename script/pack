@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# Stop on failure
+set -e
+
+# Build module and documentaiton
+pushd src
+make
+popd
+pushd doc
+markdown  ReleaseNotes.md >ReleaseNotes.html
+popd
+
+
+# Set up a dist folder
+rm -rf dist
+mkdir dist
+cp src/41cl.mod dist/
+cp doc/ReleaseNotes.html dist/
+
+pushd dist
+modtool --extract-rom-pages 41cl.mod
+zip -r mainframe ReleaseNotes.html NUT0.rom NUT1.rom NUT2.rom TIME.rom XFUNS3.rom XFUNS5.rom
+popd
