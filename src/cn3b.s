@@ -1115,25 +1115,24 @@ NAME4D:
               c=m                   ; get XADR
               rcr     11            ; put XADR to C.M
               m=c                   ; put XADR to M[6:3]
-              ?s3=1                 ; program mode?
-              gonc    NAME4E        ; no
               cxisa
               ?c#0    x             ; programmable?
-              gonc    NAME4E        ; no
-              lc      3             ; set XROM bit(5)
-                                    ; & insert bit(4)
-              goto    NAME4G
+              goc     NAME4E        ; yes
 ; * For microcode FCNs in plug-in ROMs, if C(XADR)=0 then we look
 ; * at C(XADR+1) to determine whether the FCN should be executed on
 ; * key down.  If C(XADR+1)=0 then the FCN is XKD else the FCN is
 ; * a normal non-programmable function.
-NAME4E:       c=c+1   m
+              c=c+1   m
               cxisa
               ?c#0    x             ; is C(XADR+1) non-zero?
               goc     NAME4F
-              gotoc                 ; XKD FCN - go do it
-
-NAME4F:       lc      2             ; set XROM bit(5) only
+              gotoc                 ; no, XKD FCN - go do it
+NAME4E:       ?s3=1                 ; program mode?
+              gonc    NAME4F        ; no
+              lc      3             ; yes, set XROM bit(5)
+                                    ; & insert bit(4)
+              goto    NAME4G
+NAME4F:       lc      2             ; set XROM bit(5)
 NAME4G:       lc      0
               st=c                  ; initialize PTEMP2
               pt=     0
