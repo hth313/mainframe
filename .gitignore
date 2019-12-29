@@ -2,5 +2,10 @@
 *.lst
 src/41cv.mod
 src/41cx.mod
+src/41cv.elf
+src/41cx.elf
 src/41cv
 src/41cx
+.vscode/
+dist/
+doc/ReleaseNotes.html
