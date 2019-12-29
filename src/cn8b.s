@@ -393,6 +393,23 @@ PKIO20:       c=n
               ?b#0    s             ; is this buffer being used ?
               gsubc   PUTREG        ; yes. put reg back.
               goto    PKIO20
+
+; * Patch to fix prompting XROM instructions not to overwrite the second
+; * byte of the instruction with the postfix operand. For XROMs the
+; * operand is passed on the side in B.X
+              .public stackPostfixPatch
+stackPostfixPatch:
+              ?s5=1                 ; XROM?
+              goc     STK12         ; yes
+              rcr     11            ; no
+              pt=     2
+              a=c     wpt
+STK11:        golong  NLT020
+
+STK12:        rcr     12
+              bcex    x
+              goto    STK11
+
               .fillto 0x155         ; preserve entry table
 ; *
 ; * CLRREG - clear an unused reg. in program memory
