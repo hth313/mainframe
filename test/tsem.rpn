@@ -1,0 +1,94 @@
+.import 41cx
+
+01 LBL "TSEM"               // Test Super-Extended Memory
+02 RCLFLAG                // A:
+03 STO 03                 // A:  get flags 00 to 43 and store it to REG 03
+04 FIX 0                  // A:  display setting: no decimal digits
+05 CF 29                  // A:  display setting: no decimal point
+06 "TSEM"                 // A:
+07 ASTO 02                // A:  store data file name to REG 02
+08 SF 25                  // B:  handle missing file error, deactivate error report
+09 PURFL                  // B:  purge file, clesr flag 25 if it does not exist
+10 CF 25                  // B:  reeactivate error report
+11 EMROOM                 // C:  get how much memory is left to work with for this test
+12 2                      // C:  file header size
+13 -                      // C:  get number of data records by substracting file header
+14 X<=0?                  // C:  do we have some data records memory left ?
+15 GTO 13                 // C:  no we do not, display error message
+16 STO 00                 // C:  store number of data records to REG 00
+17 CRFLD                  // C:  create file data "TSEM"
+18 "WRITING"              // D:
+19 AVIEW                  // D:  display upcoming action
+20 SF 25                  // D:  setup ignore error for when the file will be full
+21 .                      // D:  init counter
+22 LBL 00                 // D:  write loop
+23 1                      // D:
+24 +                      // D:  counter = counter + 1
+25 SAVEX                  // D:  write value to data file
+26 "W:"                   // D:
+27 XEQ 11                 // D:  show progress
+28 FS? 25                 // D:  have we reached the end of file ?
+29 GTO 00                 // D:  no we have not, go write another number
+30 1                      // D:
+31 -                      // D:  counter = counter - 1, because last SAVEX failed
+32 STO 01                 // D:  store biggest number saved to REG 01
+33 "W:"                   // D:
+34 ARCL X                 // D:
+35 AVIEW                  // D:  show last number written
+36 PSE                    // D:  give user time to see it
+37 "READING"              // E:
+38 AVIEW                  // E:  display upcoming action
+39 CLA                    // E:  recall data file name from REG 02
+40 ARCL 02                // E:
+41 .                      // E:  data file index value & init counter
+42 SEEKPTA                // E:  reset data pointer to the file beginning
+43 SF 25                  // E:  setup ignore error for when we reached the end of file
+44 LBL 01                 // E:  read back loop
+45 1                      // E:
+46 +                      // E:  counter = counter + 1
+47 GETX                   // E:  read value from data file
+48 FC? 25                 // E:  have we reached the end of file ?
+49 GTO 02                 // E:  yes we did, go to next step
+50 X≠Y?                   // E:  is value read back is equal to what was stored ?
+51 GTO 12                 // E:  no, display error message
+52 RDN                    // E:  restore stack
+53 "R:"                   // E:
+54 XEQ 11                 // E:  show progress
+55 GTO 01                 // E:  go read another number
+56 LBL 02                 // E:  all data has been read
+57 RDN                    // E:  restore stack
+58 "R:"                   // E:
+59 ARCL X                 // E:
+60 AVIEW                  // E:  show last number read
+61 PSE                    // E:
+62 RCL 00                 // F:  recall number of data records
+63 X≠Y?                   // F:  is total number of values match ?
+64 GTO 12                 // F:  no, display error message
+65 RDN                    // F:  restore stack
+66 RCL 01                 // F:  recall biggest number saved
+67 X≠Y?                   // F:  is both number match ?
+68 GTO 12                 // F:  no, display error message
+69 "SUCCES"               // F:  success message
+70 GTO 14                 // F:  goto global exit point
+71 LBL 11                 // G:  display X at each hundred number
+72 ENTER                  // G:  copy X in Y
+73 ENTER                  // G:  copy X, Y & Z
+74 100                    // G:  overwrite X with 100
+75 MOD                    // G:  Y modulo 100
+76 X=0?                   // G:  do we have a number to show ?
+77 ARCL Y                 // G:  yes we do
+78 X=0?                   // G:  do we have a number to show ?
+79 AVIEW                  // G:  yes we do
+80 RDN                    // G:  clean up stack, or whats left of it
+81 RTN                    // G:  return to caller routine
+82 LBL 12                 // H:  data read error handler
+83 "DATA NOT EQ"          // H:  error message
+84 GTO 14                 // H:  goto exit point
+85 LBL 13                 // I:  error handler
+86 "X-MEM FULL"           // I:  data file space error message
+87 GTO 14                 // I:  goto exit point
+88 LBL 14                 // J:  exit point
+89 AVIEW                  // J:  show message
+90 RCL 03                 // J:  recall original flags (00 to 43)
+91 STOFLAG                // J:  restore flags
+92 END                    // J:  program end

@@ -1,5 +1,5 @@
 
-RPNS = xmem.rpn
+RPNS = xmem.rpn tsem.rpn
 
 SRCS = test.s
 OBJS = $(RPNS:%.rpn=%.o) $(SRCS:%.s=%.o)
