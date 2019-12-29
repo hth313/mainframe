@@ -371,7 +371,7 @@ PAR130:       ?s7=1                 ; DP?
               ?s0=1                 ; op2 bit 0?
               goc     PAR112
                                     ; must be STO
-              ?a#0    S             ; +-*/ ?
+              ?a#0    s             ; +-*/ ?
               gonc    PAR112        ; no
               ldi     145           ; yes
               acex
@@ -653,6 +653,7 @@ STK00:
               .public STK04
 ; * Entry point for Wand (3-16-79)
 ; *
+              .extern stackPostfixPatch
 STK04:
               gosub   GTACOD        ; get alpha code[keycode]
               pt=     13
@@ -668,18 +669,18 @@ STK05:        gosub   MASK          ; put char out to LCD
               c=g
               st=c
               c=regn  10
-              pt=     2
+              pt=     13
               lc      7
-              ?s6=1                 ; indirect?
+              ?s6=1
               gonc    STK10
-              pt=     2
+              pt=     13
               lc      15
-STK10:
+STK10:        asr
+              a=c     s             ; A[13:12]= postfix operand
               acex
-              rcr     12
-              acex    PT
-              golong  NLT020
+              golong  stackPostfixPatch
 
+              .fillto 0x021e
 STK15:        gosub   BLINK
               goto    STK03
 
