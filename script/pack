@@ -8,7 +8,7 @@ pushd src
 make
 popd
 pushd doc
-markdown  ReleaseNotes.md >ReleaseNotes.html
+markdown_py -x extra  ReleaseNotes.md >ReleaseNotes.html
 popd
 
 
