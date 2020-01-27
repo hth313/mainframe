@@ -2,7 +2,7 @@
 
 ## Version IFG, Time 3A, Extended Functions 4A
 
-September 29, 2019
+January 26, 2020
 
 ### Highlights
 
@@ -43,6 +43,56 @@ September 29, 2019
   extended memory if used.
   Modules that call the entries in the HP-41CX/CL OS will still work.
 
+### Upgrading
+
+If you want to try the updated ROM images out from RAM, load them to
+RAM page 820-826 as follows:
+
+ Page  | Image
+------ | -------
+ 820   | NUT0
+ 821   | NUT1
+ 822   | NUT2
+ 823   | XFUNS3
+ 824   | TIME
+ 825   | XFUNS5
+
+Then use `"%820 0"` `PPLUG` and `"*824 5"` `PPLUG` sets up the mapping and
+finally `MAPEN` to enable it. The commands are available in the XFNX (41CL
+extreme functions) module. This way you can try it out before flashing.
+
+The alternative mapping stays until you turn the calculator off. This means
+that you need to `MAPEN` every time you turn your calculator on. Failure to
+do this will cause the calculator to revert to the flash version OS version,
+with the old style extended memory routines that do not understand new layout.
+Running with the old routines will cause corruption of the extended memory!
+Be careful! Once you feel confident that you want to use the new OS, it is
+probably easiest to just flash it.
+
+To flash the OS update, set up an OS sector by copying the existing OS sector
+(page 000-007) to 810-817. Use `"000"` `P8BFR` to do this. Then copy the
+updated ROMs over the appropriate locations in the 810 sector buffer
+and verify checksums:
+
+Page  | Image   | 32-bit CRC
+----- | ------- | -----------
+ 810  | NUTO    | `54d262cf`
+ 811  | NUT1    | `baf1fc53`
+ 812  | NUT2    | `2a14a14f`
+ 813  | XFNS3   | `d750d0a5`
+ 814  | SERVICE |
+ 815  | XFNS5   | `ff4c5c2a`
+ 816  | TIME    | `0af2caaf`
+ 817  | YFNZ    |
+
+Refer to the UPDATE module and `mem_ref.doc` to fill out the 8 pages
+in the the correct order.
+
+As always, use fresh batteries when flashing and you need to enable
+flashing of the OS sector.
+Use `OSUPDT` and `"000"` `P8UPD` to flash it. Study the UPDATE manual
+so that you feel confident that you know what you are doing before
+trying it.
 
 ### Corrections
 
