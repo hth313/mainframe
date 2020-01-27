@@ -5401,7 +5401,7 @@ LSWK30:       wsint                 ; write & start interval timer
               goto    LSWK67
 LSWK58:       gosub   ENTMRS
 
-LSWK60:       s4=     0             ; clear clock dislay bit
+LSWK60:       s4=     0             ; clear clock display bit
 LSWK65:       stpint                ; stop interval timer
 LSWK67:       s3=     0             ; clear setting to clock mode bit
               cstex
