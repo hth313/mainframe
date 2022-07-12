@@ -2570,7 +2570,7 @@ CLRF40:       c=n
               s8=     0
               goto    CRF220
 
-              .public CLRFL
+              .public CLFL
               .name   "CLFL"
 CLFL:         b=0     s
               gosub   FLSHAC
