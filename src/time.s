@@ -421,7 +421,7 @@ RUNSW:        gosub   INITMR        ; initialize timer if necessary, PT=B
 ;;; *              timer chip
 ;;; **********************************************************************
 
-              .public GETMR, GETMRC, ENTMR
+              .public GETMR, GETMRC
 GETMR:        gosub   ENTMR
               pt=b                  ; select stopwatch clock
               rdtime                ; read stopwatch time
@@ -5832,8 +5832,6 @@ ALM170:       gosub   ACKALM     ; reset alarm if it has interval
               .public ALM171
 ALM171:       c=m                   ; (P+2) C.X= current alarm address
               goto    ALM220
-
-              .public ALM171
 
 ;;; **********************************************************************
 ;;; * ALMNOW
