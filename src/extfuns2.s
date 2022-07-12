@@ -482,12 +482,9 @@ CLM15:        ?a<c    x             ; we done ?
 ;;; *  The procedure is as following:
 ;;; *  1. Clear the bitmap
 ;;; *  2. Restore the key reassignments of mainframe functions & XROM functions
-;;; *  3.  Restore key reassignments in alpha labels; if the key has already
-;;; *      been assigned to another function:
-;;; *    A. If it is after reading in a status track, clear the key code
-;;; *       in the alpha label.
-;;; *    B. If it is after reading in a program, find the key code somewhere
-;;; *       else and clear it there.
+;;; *  3. Restore key reassignments in alpha labels; if the key has already
+;;; *     been assigned to another function, find the key code somewhere
+;;; *     else and clear it there.
 
               .public RSTKCA
 RSTKCA:       gosub   ENCP00
